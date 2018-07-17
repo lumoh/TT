@@ -85,20 +85,6 @@ public class Tile : MonoBehaviour {
         return flag;
     }
 
-    public bool HasFallingBlock(int layer)
-    {
-        bool flag = false;
-        if (_boardObjects != null && layer >= 0 && layer < NUM_LAYERS)
-        {
-            BoardObject boardObject = _boardObjects[layer];
-            if (boardObject != null && boardObject.GetComponent<FallingObject>() != null)
-            {
-                flag = true;
-            }
-        }
-        return flag;
-    }
-
     public void AddSpawner(Spawner spawner)
     {
         if (_spawners != null && spawner.TileLayer >= 0 && spawner.TileLayer < NUM_LAYERS)

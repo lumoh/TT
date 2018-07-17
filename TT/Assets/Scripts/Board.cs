@@ -17,6 +17,7 @@ public class Board : MonoBehaviour
     /// </summary>
     public Camera BoardCamera;
 
+    [Header("Board Dimensions")]
     /// <summary>
     /// num blocks vertical
     /// </summary>
@@ -47,6 +48,11 @@ public class Board : MonoBehaviour
     /// </summary>
     private List<List<Tile>> _tiles;
 
+    /// <summary>
+    /// The swap on cooldown.
+    /// </summary>
+    private bool _swapOnCooldown = false;
+
 	/// <summary>
     /// initialize a board and setup camera
     /// </summary>
@@ -57,7 +63,7 @@ public class Board : MonoBehaviour
         MatchFinder = new MatchFinder();
         BoardCamera.transform.localPosition = new Vector3(2.5f, -5.75f, -10);
         transform.localPosition = new Vector3(0, 0, 0);
-        Init(6, 13);
+        Init(3, 5);
 	}
 
     /// <summary>
@@ -73,7 +79,7 @@ public class Board : MonoBehaviour
         MinY = 0;
         MaxY = Height - 1;
 
-        QueuedRows = 2;
+        QueuedRows = 0;
 
         _tiles = new List<List<Tile>>();
         createTiles();
@@ -117,7 +123,7 @@ public class Board : MonoBehaviour
         {
             for (int x = 0; x < Width; x++)
             {
-                if (y > 4)
+                if (y >= 0)
                 {
                     Tile tile = GetTile(x, y);
                     if (tile != null) 
@@ -218,6 +224,10 @@ public class Board : MonoBehaviour
         return flag;
     }
 
+    /// <summary>
+    /// Finds the matches.
+    /// </summary>
+    /// <returns><c>true</c>, if matches was found, <c>false</c> otherwise.</returns>
     public bool FindMatches()
     {
         List<MatchCombo> matchCombos = MatchFinder.GetAllMatchesOnBoard(this);
@@ -225,7 +235,6 @@ public class Board : MonoBehaviour
         {
             return false;
         }
-
         for (int i = 0; i < matchCombos.Count; ++i) 
         {
             for(int j = 0; j < matchCombos[i].matches.Count; ++j)
@@ -238,6 +247,95 @@ public class Board : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public void Swap(Tile t1, Tile t2)
+    {
+        if(t1 != null && t2 != null && !_swapOnCooldown)
+        {
+            BoardObject b1 = t1.GetBoardObect(3);
+            BoardObject b2 = t2.GetBoardObect(3);
+
+            t1.RemoveBoardObject(3);
+            t2.RemoveBoardObject(3);
+
+            _swapOnCooldown = true;
+
+            if(b1 != null)
+            {
+                b1.Swap(t2);
+            }
+
+            if(b2 != null && b2.CanSwap())
+            {
+                b2.Swap(t1);
+            }
+
+            LeanTween.delayedCall(0.25f, () =>
+            {
+                _swapOnCooldown = false;
+            });
+        }
+    }
+
+    private void swapSettled(BoardObject b1, BoardObject b2)
+    {
+        if(b1 != null)
+        {
+            b1.State = BoardObjectState.SETTLED;
+        }
+
+        if(b2 != null)
+        {
+            b2.State = BoardObjectState.SETTLED;
+        }
+    }
+
+    public void FallColumn(int x)
+    {
+        List<BoardObject> blocks = new List<BoardObject>();
+        for(int y = MaxY; y >= MinY; y--)
+        {
+            BoardObject boardObject = GetBoardObject(x, y);
+            if(boardObject != null && boardObject.State == BoardObjectState.SETTLED)
+            {
+                int tilesToDrop = 0;
+                for(int v = y + 1; v <= MaxY; v++)
+                {
+                    Tile checkTile = GetTile(x, v, true);
+                    if(checkTile != null)
+                    {
+                        if(!checkTile.IsOccupied(3))
+                        {
+                            tilesToDrop++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if(tilesToDrop > 0)
+                {
+                    blocks.Add(boardObject);
+                    boardObject.State = BoardObjectState.FALLING;
+                    boardObject.MyTile.RemoveBoardObject(boardObject.TileLayer);
+                    Tile destTile = GetTile(x, y + tilesToDrop, true);
+                    if(destTile != null)
+                    {
+                        destTile.AddBoardObject(boardObject);
+                    }
+                }
+            }
+        }
+            
+        foreach(BoardObject block in blocks)
+        {
+            block.State = BoardObjectState.SETTLED;
+        }
+
+        FindMatches();
     }
 
     private void addRandomBlock(string type, Tile tile)

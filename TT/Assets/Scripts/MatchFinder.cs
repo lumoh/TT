@@ -85,7 +85,7 @@ public class MatchFinder
         coQueue.Clear();
         Array.Clear(hasVisited, 0, hasVisited.Length);
         
-        if (blockObject.CanMatch) 
+        if (blockObject.CanMatch()) 
         {
             BoardObject left;
             BoardObject right;
@@ -146,7 +146,7 @@ public class MatchFinder
     {
         return newBlock != null 
             && visitedBlocks[newBlock.X, newBlock.Y] == false 
-            && newBlock.CanMatch 
+            && newBlock.CanMatch() 
             && newBlock.Color == existingColor
             && newBlock.Color != BoardObjectColor.NONE;
     }
@@ -369,7 +369,7 @@ public class MatchFinder
 
                         if ((topLeft == null || topRight == null || bottomLeft == null || bottomRight == null) ||
                             (topLeft.Type == BoardObjectType.RAINBOW || topRight.Type == BoardObjectType.RAINBOW || bottomLeft.Type == BoardObjectType.RAINBOW || bottomRight.Type == BoardObjectType.RAINBOW) ||
-                            (!topLeft.CanMatch) || (!topRight.CanMatch) || (!bottomLeft.CanMatch) || (!bottomRight.CanMatch)) 
+                            (!topLeft.CanMatch()) || (!topRight.CanMatch()) || (!bottomLeft.CanMatch()) || (!bottomRight.CanMatch())) 
                         {
                             return null;
                         }
@@ -573,7 +573,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(i, blockObj.Y);
-            if(sp == null || !sp.CanMatch || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
             i--;
         }
         
@@ -581,7 +581,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(j, blockObj.Y);
-            if(sp == null || !sp.CanMatch || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
             j++;
         }
         
@@ -621,7 +621,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(blockObj.X, i);
-            if(sp == null || !sp.CanMatch || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
             i--;
         }
         
@@ -629,7 +629,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(blockObj.X, j);
-            if(sp == null || !sp.CanMatch || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
             j++;
         }
         

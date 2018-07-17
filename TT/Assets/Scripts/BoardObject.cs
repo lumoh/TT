@@ -59,13 +59,13 @@ public class BoardObject : MonoBehaviour
         set { /* TODO */ }
     }
 
-    [SerializeField] private bool _canSwap = false;
-    public bool CanSwap { get { return _canSwap; } }
-
-    [SerializeField] private bool _canMatch = false;
-    public bool CanMatch { get { return _canMatch; } }
+    [SerializeField] public bool Swappable = true;
+    [SerializeField] public bool Matchable = true;
+    private bool _active = true;
 
     [HideInInspector] public int LastMove = 0;
+
+    public float SwapSpeed = 0.2f;
 
     [Header("Sprite Settings")]
     public SpriteRenderer MySpriteRenderer;   
@@ -89,44 +89,60 @@ public class BoardObject : MonoBehaviour
         Color = c;
     }
 
+    public bool CanSwap()
+    {
+        bool settled = State == BoardObjectState.SETTLED;
+        return Swappable &&  settled && _active;
+    }
+
+    public bool CanMatch()
+    {
+        bool settled = State == BoardObjectState.SETTLED;
+        return Matchable && _active && settled;
+    }
+
+    public void Swap(Tile t)
+    {
+        if(CanSwap())
+        {
+            State = BoardObjectState.SWAPPING;
+            LeanTween.move(gameObject, t.transform.position, 0.2f).setOnComplete(() =>
+            {
+                t.AddBoardObject(this);
+                State = BoardObjectState.SETTLED;
+            });
+        }
+    }
+
+    /// <summary>
+    /// TEMP CONTROLLER
+    /// </summary>
     public void OnMouseDown()
     {
-        if (State == BoardObjectState.SETTLED && CanSwap)
+        Tile adjacentTile = MyBoard.GetTile(X + 1, Y, true);
+        if (adjacentTile != null)
         {
-            Tile adjacentTile = MyBoard.GetTile(X + 1, Y);
-            if (adjacentTile != null)
-            {
-                BoardObject boardObject = adjacentTile.GetBoardObect(TileLayer);
-                if (boardObject != null && boardObject.State == BoardObjectState.SETTLED && boardObject.CanSwap)
-                {
-                    State = BoardObjectState.SWAPPING;
-                    boardObject.State = BoardObjectState.SWAPPING;
-
-                    LeanTween.move(boardObject.gameObject, MyTile.transform.position, 0.25f).setEase(LeanTweenType.easeOutSine);
-                    LeanTween.move(gameObject, boardObject.MyTile.transform.position, 0.25f).setEase(LeanTweenType.easeOutSine).setOnComplete(() =>
-                    {
-                        Tile oldTile = boardObject.MyTile;
-                        MyTile.RemoveBoardObject(TileLayer);
-                        MyTile.AddBoardObject(boardObject);
-                        oldTile.AddBoardObject(this);
-
-                        boardObject.State = BoardObjectState.SETTLED;
-                        State = BoardObjectState.SETTLED;
-                    });
-                }
-            }
-        }              
+            MyBoard.Swap(MyTile, adjacentTile);
+        }
     }
 
     public virtual void Break()
-    {
+    {        
+        SetActive(false);
         State = BoardObjectState.BREAKING;
-        MyTile.RemoveBoardObject(TileLayer);
-        Destroy(gameObject);
+        Tile tile = MyTile;
+
+        //LeanTween.delayedCall(gameObject, 2f, () =>
+        //{
+            Destroy(gameObject);
+            MyTile.RemoveBoardObject(TileLayer);
+            MyBoard.FallColumn(tile.X);
+        //});
     }
 
     public virtual void OnDestroy()
     {
+        MyTile.RemoveBoardObject(TileLayer);
         LeanTween.cancel(gameObject);
     }
 
@@ -135,8 +151,7 @@ public class BoardObject : MonoBehaviour
         Color c = MySpriteRenderer.color;
         c.a = 0.25f;
         MySpriteRenderer.color = c;
-        _canSwap = false;
-        _canMatch = false;
+        _active = active;
     }
 
     protected virtual void setSpriteForColor()
