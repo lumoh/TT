@@ -202,7 +202,7 @@ public class BoardObject : MonoBehaviour
                 else if(targetTile != null)
                 {
                     MyTile.RemoveBoardObject(TileLayer);
-                    targetTile.AddBoardObject(this);
+                    targetTile.AddBoardObject(this, false);
                     advanceFallingObject();
                 }
             }
@@ -215,8 +215,8 @@ public class BoardObject : MonoBehaviour
 
     private void advanceFallingObject()
     {
-        _velocity = new Vector3(0, -1, 0);
-        Vector3 newPos = transform.position + (_velocity * Time.deltaTime);
+        _velocity += new Vector3(0, -2f, 0) * Time.deltaTime;
+        Vector3 newPos = transform.position + _velocity;
         if (newPos.y < MyTile.transform.position.y)
         {
             newPos = MyTile.transform.position;
