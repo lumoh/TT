@@ -112,12 +112,12 @@ public class BoardObject : MonoBehaviour
         });
     }
 
-    public virtual void Break()
+    public virtual void Break(float delay = 2f)
     {
         SetActive(false);
         State = BoardObjectState.BREAKING;
 
-        LeanTween.delayedCall(gameObject, 2f, () =>
+        LeanTween.delayedCall(gameObject, delay, () =>
         {
             MyTile.RemoveBoardObject(TileLayer);
             Destroy(gameObject);
