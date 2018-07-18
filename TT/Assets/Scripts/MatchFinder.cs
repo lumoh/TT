@@ -185,301 +185,249 @@ public class MatchFinder
     /// <param name="blockObj">Block object.</param>
     public MatchCombo FindSingleMatch(Board board, BoardObject blockObj)
     {
-        bool MATCH_4 = true;
-        if (MATCH_4)
+        bool MATCH_4 = false;
+
+        List<BoardObject> hMatches = GetHorizontalMatch (board, blockObj);
+        List<BoardObject> vMatches = GetVerticalMatch (board, blockObj);
+        
+        int maxPieces = 0;
+        
+        if (hMatches != null) 
         {
-            List<BoardObject> hMatches = GetHorizontalMatch (board, blockObj);
-            List<BoardObject> vMatches = GetVerticalMatch (board, blockObj);
-            
-            int maxPieces = 0;
-            
-            if (hMatches != null) 
-            {
-                maxPieces = Mathf.Max (maxPieces, hMatches.Count);
-            }
-            
-            if (vMatches != null) 
-            {
-                maxPieces = Mathf.Max (maxPieces, vMatches.Count);
-            }
-            
-            if (maxPieces == 0) 
-            {
-                return null;
-            } 
-            else 
-            {
-                MatchCombo match = new MatchCombo();
-                
-                if (maxPieces > 5) 
-                {
-                    match.type = MatchCombo.MatchTypes.MATCH_6_7;
-                } 
-                else if (maxPieces == 5) 
-                {
-                    match.type = MatchCombo.MatchTypes.MATCH_5;
-                    
-                    int midIndex = (maxPieces / 2);
-                    if (hMatches != null && vMatches != null && hMatches.Count > midIndex && vMatches.Count > midIndex) 
-                    {
-                        if ((blockObj == hMatches [midIndex] && (blockObj == vMatches [0] || blockObj == vMatches [vMatches.Count - 1])) ||
-                            (blockObj == vMatches [midIndex] && (blockObj == hMatches [0] || blockObj == hMatches [hMatches.Count - 1]))) 
-                        {
-                            match.type = MatchCombo.MatchTypes.MATCH_6_7;
-                        }
-                    }
-                } 
-                else if (hMatches != null && vMatches != null && hMatches.Count > 2 && vMatches.Count > 2) 
-                {
-                    if ((blockObj == hMatches [0] || blockObj == hMatches [hMatches.Count - 1]) &&
-                        (blockObj == vMatches [0] || blockObj == vMatches [vMatches.Count - 1])) 
-                    {
-                        match.type = MatchCombo.MatchTypes.MATCH_L;
-                    } 
-                    else 
-                    {
-                        match.type = MatchCombo.MatchTypes.MATCH_T;
-                    }
-                    
-                } 
-                else if (hMatches != null && hMatches.Count == 4) 
-                {
-                    vMatches = new List<BoardObject> ();
-                    match.type = MatchCombo.MatchTypes.MATCH_4_ROW;
-                } 
-                else if (vMatches != null && vMatches.Count == 4) 
-                {
-                    hMatches = new List<BoardObject> ();
-                    match.type = MatchCombo.MatchTypes.MATCH_4_COLUMN;
-                } 
-                else if (hMatches != null && hMatches.Count == 3) 
-                {
-                    bool found2X3Match = true;
-                    int savedY = -1;
-                    for (int i = 0; i < hMatches.Count; i++)
-                    {
-                        BoardObject bm = hMatches[i];
-                        List<BoardObject> moreVMatches = GetVerticalMatch(board, bm);
-                        if (moreVMatches == null || moreVMatches.Count < 2)
-                        {
-                            found2X3Match = false;
-                            break;
-                        }
-                        else
-                        {                          
-                            for (int j = 0; j < moreVMatches.Count; j++)
-                            {
-                                if (moreVMatches[j] != bm)
-                                {
-                                    if (savedY == -1)
-                                    {
-                                        savedY = moreVMatches[j].Y;
-                                    }
-                                    else if (savedY != moreVMatches[j].Y)
-                                    {
-                                        found2X3Match = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (found2X3Match)
-                    {
-                        match.type = MatchCombo.MatchTypes.MATCH_4_SQUARE;
-                    }
-                    else
-                    {
-                        vMatches = new List<BoardObject> ();
-                        match.type = MatchCombo.MatchTypes.MATCH_3;
-                    }                   
-                } 
-                else if (vMatches != null && vMatches.Count == 3) 
-                {
-                    bool found2X3Match = true;
-                    int savedX = -1;
-                    for (int i = 0; i < vMatches.Count; i++)
-                    {
-                        BoardObject bm = vMatches[i];
-                        List<BoardObject> moreHMatches = GetHorizontalMatch (board, bm);
-                        if (moreHMatches == null || moreHMatches.Count < 2)
-                        {
-                            found2X3Match = false;
-                            break;
-                        }
-                        else
-                        {                          
-                            for (int j = 0; j < moreHMatches.Count; j++)
-                            {
-                                if (moreHMatches[j] != bm)
-                                {
-                                    if (savedX == -1)
-                                    {
-                                        savedX = moreHMatches[j].X;
-                                    }
-                                    else if (savedX != moreHMatches[j].X)
-                                    {
-                                        found2X3Match = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (found2X3Match)
-                    {
-                        match.type = MatchCombo.MatchTypes.MATCH_4_SQUARE;
-                    }
-                    else
-                    {
-                        hMatches = new List<BoardObject>();
-                        match.type = MatchCombo.MatchTypes.MATCH_3;
-                    }
-                }
-                // MATCH 4 square logic
-                else if (hMatches != null && vMatches != null) 
-                {
-                    if ((blockObj == hMatches [0] || blockObj == hMatches [hMatches.Count - 1]) &&
-                        (blockObj == vMatches [0] || blockObj == vMatches [vMatches.Count - 1])) 
-                    {
-                        int minX;
-                        int minY;
-                        int maxX;
-                        int maxY;
-
-                        // max tile width or tile height?
-                        minX = minY = Mathf.Max (board.Width, board.Height);
-                        maxX = maxY = 0;
-
-                        for (int i = 0; i < hMatches.Count; i++) 
-                        {
-                            minX = Mathf.Min (hMatches [i].X, Mathf.Min (vMatches [i].X, minX));
-                            minY = Mathf.Min (hMatches [i].Y, Mathf.Min (vMatches [i].Y, minY));
-
-                            maxX = Mathf.Max (hMatches [i].X, Mathf.Max (vMatches [i].X, maxX));
-                            maxY = Mathf.Max (hMatches [i].Y, Mathf.Max (vMatches [i].Y, maxY));
-                        }
-
-                        BoardObject topLeft = board.GetBoardObject (minX, maxY);
-                        BoardObject topRight = board.GetBoardObject (maxX, maxY);
-                        BoardObject bottomLeft = board.GetBoardObject (minX, minY);
-                        BoardObject bottomRight = board.GetBoardObject (maxX, minY);
-
-                        if ((topLeft == null || topRight == null || bottomLeft == null || bottomRight == null) ||
-                            (topLeft.Type == BoardObjectType.RAINBOW || topRight.Type == BoardObjectType.RAINBOW || bottomLeft.Type == BoardObjectType.RAINBOW || bottomRight.Type == BoardObjectType.RAINBOW) ||
-                            (!topLeft.CanMatch()) || (!topRight.CanMatch()) || (!bottomLeft.CanMatch()) || (!bottomRight.CanMatch())) 
-                        {
-                            return null;
-                        }
-
-                        if (topLeft.Color == topRight.Color && topLeft.Color == bottomLeft.Color && topLeft.Color == bottomRight.Color) 
-                        {
-                            if (hMatches.IndexOf (topLeft) < 0 && vMatches.IndexOf (topLeft) < 0) 
-                            {
-                                hMatches.Add (topLeft);
-                            } else if (hMatches.IndexOf (topRight) < 0 && vMatches.IndexOf (topRight) < 0) 
-                            {
-                                hMatches.Add (topRight);
-                            } else if (hMatches.IndexOf (bottomLeft) < 0 && vMatches.IndexOf (bottomLeft) < 0) 
-                            {
-                                hMatches.Add (bottomLeft);
-                            } else if (hMatches.IndexOf (bottomRight) < 0 && vMatches.IndexOf (bottomRight) < 0) 
-                            {
-                                hMatches.Add (bottomRight);
-                            }
-
-                            match.type = MatchCombo.MatchTypes.MATCH_4_SQUARE;
-                        } 
-                        else 
-                        {
-                            return null;
-                        }
-                    }
-                }
-                else 
-                {
-                    return null;
-                }
-                
-                if (match.type == MatchCombo.MatchTypes.MATCH_5) 
-                {
-                    if (vMatches != null && vMatches.Count == maxPieces) 
-                    {
-                        match.matches = vMatches;
-                    } 
-                    else 
-                    {
-                        match.matches = hMatches;
-                    }
-                } 
-                else 
-                {
-                    match.matches = Util.ConcatListWithoutDuplicate (hMatches, vMatches);
-                }
-                
-                return match;
-            }
+            maxPieces = Mathf.Max (maxPieces, hMatches.Count);
+        }
+        
+        if (vMatches != null) 
+        {
+            maxPieces = Mathf.Max (maxPieces, vMatches.Count);
+        }
+        
+        if (maxPieces == 0) 
+        {
+            return null;
         } 
         else 
         {
-            List<BoardObject> hMatches = GetHorizontalMatch(board, blockObj);
-            List<BoardObject> vMatches = GetVerticalMatch(board, blockObj);
+            MatchCombo match = new MatchCombo();
             
-            int maxPieces = 0;
-            
-            if(hMatches != null)
+            if (maxPieces > 5) 
             {
-                maxPieces = Mathf.Max(maxPieces, hMatches.Count);
-            }
-            
-            if(vMatches != null)
+                match.type = MatchCombo.MatchTypes.MATCH_6_7;
+            } 
+            else if (maxPieces == 5) 
             {
-                maxPieces = Mathf.Max(maxPieces, vMatches.Count);
-            }
-            
-            if(maxPieces == 0)
-            {
-                return null;
-            }
-            else
-            {
-                MatchCombo match = new MatchCombo();
+                match.type = MatchCombo.MatchTypes.MATCH_5;
                 
-                if(maxPieces >= 5)
+                int midIndex = (maxPieces / 2);
+                if (hMatches != null && vMatches != null && hMatches.Count > midIndex && vMatches.Count > midIndex) 
                 {
-                    match.type = MatchCombo.MatchTypes.MATCH_5;
-                }
-                else if(hMatches != null && vMatches != null)
-                {
-                    if((blockObj == hMatches[0] || blockObj == hMatches[hMatches.Count - 1]) &&
-                       (blockObj == vMatches[0] || blockObj == vMatches[vMatches.Count -1]))
+                    if ((blockObj == hMatches [midIndex] && (blockObj == vMatches [0] || blockObj == vMatches [vMatches.Count - 1])) ||
+                        (blockObj == vMatches [midIndex] && (blockObj == hMatches [0] || blockObj == hMatches [hMatches.Count - 1]))) 
                     {
-                        match.type = MatchCombo.MatchTypes.MATCH_L;
+                        match.type = MatchCombo.MatchTypes.MATCH_6_7;
+                    }
+                }
+            } 
+            else if (hMatches != null && vMatches != null && hMatches.Count > 2 && vMatches.Count > 2) 
+            {
+                if ((blockObj == hMatches [0] || blockObj == hMatches [hMatches.Count - 1]) &&
+                    (blockObj == vMatches [0] || blockObj == vMatches [vMatches.Count - 1])) 
+                {
+                    match.type = MatchCombo.MatchTypes.MATCH_L;
+                } 
+                else 
+                {
+                    match.type = MatchCombo.MatchTypes.MATCH_T;
+                }
+                
+            } 
+            else if (hMatches != null && hMatches.Count == 4) 
+            {
+                vMatches = new List<BoardObject> ();
+                match.type = MatchCombo.MatchTypes.MATCH_4_ROW;
+            } 
+            else if (vMatches != null && vMatches.Count == 4) 
+            {
+                hMatches = new List<BoardObject> ();
+                match.type = MatchCombo.MatchTypes.MATCH_4_COLUMN;
+            } 
+            else if (hMatches != null && hMatches.Count == 3) 
+            {
+                bool found2X3Match = false;
+                if(MATCH_4)
+                {
+                    found2X3Match = true;
+                }
+
+                int savedY = -1;
+                for (int i = 0; i < hMatches.Count; i++)
+                {
+                    BoardObject bm = hMatches[i];
+                    List<BoardObject> moreVMatches = GetVerticalMatch(board, bm);
+                    if (moreVMatches == null || moreVMatches.Count < 2)
+                    {
+                        found2X3Match = false;
+                        break;
                     }
                     else
-                    {
-                        match.type = MatchCombo.MatchTypes.MATCH_T;
+                    {                          
+                        for (int j = 0; j < moreVMatches.Count; j++)
+                        {
+                            if (moreVMatches[j] != bm)
+                            {
+                                if (savedY == -1)
+                                {
+                                    savedY = moreVMatches[j].Y;
+                                }
+                                else if (savedY != moreVMatches[j].Y)
+                                {
+                                    found2X3Match = false;
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    
                 }
-                else if(hMatches != null && hMatches.Count == 4)
+
+                if (found2X3Match)
                 {
-                    match.type = MatchCombo.MatchTypes.MATCH_4_ROW;
-                }
-                else if(vMatches != null && vMatches.Count == 4)
-                {
-                    match.type = MatchCombo.MatchTypes.MATCH_4_COLUMN;
+                    match.type = MatchCombo.MatchTypes.MATCH_4_SQUARE;
                 }
                 else
                 {
+                    vMatches = new List<BoardObject> ();
+                    match.type = MatchCombo.MatchTypes.MATCH_3;
+                }                   
+            } 
+            else if (vMatches != null && vMatches.Count == 3) 
+            {
+                bool found2X3Match = false;
+                if(MATCH_4)
+                {
+                    found2X3Match = true;
+                }
+                int savedX = -1;
+                for (int i = 0; i < vMatches.Count; i++)
+                {
+                    BoardObject bm = vMatches[i];
+                    List<BoardObject> moreHMatches = GetHorizontalMatch (board, bm);
+                    if (moreHMatches == null || moreHMatches.Count < 2)
+                    {
+                        found2X3Match = false;
+                        break;
+                    }
+                    else
+                    {                          
+                        for (int j = 0; j < moreHMatches.Count; j++)
+                        {
+                            if (moreHMatches[j] != bm)
+                            {
+                                if (savedX == -1)
+                                {
+                                    savedX = moreHMatches[j].X;
+                                }
+                                else if (savedX != moreHMatches[j].X)
+                                {
+                                    found2X3Match = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (found2X3Match)
+                {
+                    match.type = MatchCombo.MatchTypes.MATCH_4_SQUARE;
+                }
+                else
+                {
+                    hMatches = new List<BoardObject>();
                     match.type = MatchCombo.MatchTypes.MATCH_3;
                 }
-                
-                match.matches = Util.ConcatListWithoutDuplicate(hMatches, vMatches);
-                return match;
             }
+            // MATCH 4 square logic
+            else if (hMatches != null && vMatches != null && MATCH_4) 
+            {
+                if ((blockObj == hMatches [0] || blockObj == hMatches [hMatches.Count - 1]) &&
+                    (blockObj == vMatches [0] || blockObj == vMatches [vMatches.Count - 1])) 
+                {
+                    int minX;
+                    int minY;
+                    int maxX;
+                    int maxY;
+
+                    // max tile width or tile height?
+                    minX = minY = Mathf.Max (board.Width, board.Height);
+                    maxX = maxY = 0;
+
+                    for (int i = 0; i < hMatches.Count; i++) 
+                    {
+                        minX = Mathf.Min (hMatches [i].X, Mathf.Min (vMatches [i].X, minX));
+                        minY = Mathf.Min (hMatches [i].Y, Mathf.Min (vMatches [i].Y, minY));
+
+                        maxX = Mathf.Max (hMatches [i].X, Mathf.Max (vMatches [i].X, maxX));
+                        maxY = Mathf.Max (hMatches [i].Y, Mathf.Max (vMatches [i].Y, maxY));
+                    }
+
+                    BoardObject topLeft = board.GetBoardObject (minX, maxY);
+                    BoardObject topRight = board.GetBoardObject (maxX, maxY);
+                    BoardObject bottomLeft = board.GetBoardObject (minX, minY);
+                    BoardObject bottomRight = board.GetBoardObject (maxX, minY);
+
+                    if ((topLeft == null || topRight == null || bottomLeft == null || bottomRight == null) ||
+                        (topLeft.Type == BoardObjectType.RAINBOW || topRight.Type == BoardObjectType.RAINBOW || bottomLeft.Type == BoardObjectType.RAINBOW || bottomRight.Type == BoardObjectType.RAINBOW) ||
+                        (!topLeft.CanMatch()) || (!topRight.CanMatch()) || (!bottomLeft.CanMatch()) || (!bottomRight.CanMatch())) 
+                    {
+                        return null;
+                    }
+
+                    if (topLeft.Color == topRight.Color && topLeft.Color == bottomLeft.Color && topLeft.Color == bottomRight.Color) 
+                    {
+                        if (hMatches.IndexOf (topLeft) < 0 && vMatches.IndexOf (topLeft) < 0) 
+                        {
+                            hMatches.Add (topLeft);
+                        } else if (hMatches.IndexOf (topRight) < 0 && vMatches.IndexOf (topRight) < 0) 
+                        {
+                            hMatches.Add (topRight);
+                        } else if (hMatches.IndexOf (bottomLeft) < 0 && vMatches.IndexOf (bottomLeft) < 0) 
+                        {
+                            hMatches.Add (bottomLeft);
+                        } else if (hMatches.IndexOf (bottomRight) < 0 && vMatches.IndexOf (bottomRight) < 0) 
+                        {
+                            hMatches.Add (bottomRight);
+                        }
+
+                        match.type = MatchCombo.MatchTypes.MATCH_4_SQUARE;
+                    } 
+                    else 
+                    {
+                        return null;
+                    }
+                }
+            }
+            else 
+            {
+                return null;
+            }
+            
+            if (match.type == MatchCombo.MatchTypes.MATCH_5) 
+            {
+                if (vMatches != null && vMatches.Count == maxPieces) 
+                {
+                    match.matches = vMatches;
+                } 
+                else 
+                {
+                    match.matches = hMatches;
+                }
+            } 
+            else 
+            {
+                match.matches = Util.ConcatListWithoutDuplicate (hMatches, vMatches);
+            }
+            
+            return match;
         }
     }
     

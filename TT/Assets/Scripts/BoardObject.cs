@@ -170,6 +170,11 @@ public class BoardObject : MonoBehaviour
 
     void Update()
     {
+        if(transform.position.y > MyTile.transform.position.y)
+        {
+            State = BoardObjectState.FALLING;
+        }
+
         // board object is settled squarely on its tile
         if(State == BoardObjectState.SETTLED)
         {            

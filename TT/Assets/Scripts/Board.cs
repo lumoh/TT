@@ -86,6 +86,7 @@ public class Board : MonoBehaviour
 
         // TEST
         addRandomBlocks();
+        addSpawners();
 
         LeanTween.delayedCall(0.5f, () =>
         {
@@ -128,14 +129,23 @@ public class Board : MonoBehaviour
         {
             for (int x = 0; x < Width; x++)
             {
-                if (y >= 4)
+                Tile tile = GetTile(x, y);
+                if (tile != null) 
                 {
-                    Tile tile = GetTile(x, y);
-                    if (tile != null) 
-                    {
-                        AddRandomBlock("Block", tile);
-                    }
+                    AddRandomBlock("Block", tile);
                 }
+            }
+        }
+    }
+
+    private void addSpawners()
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            Tile tile = GetTile(x, 0);
+            if (tile != null) 
+            {
+                addSpawner(tile, "Block", 3);
             }
         }
     }
@@ -170,12 +180,12 @@ public class Board : MonoBehaviour
     /// <param name="boardObject">Board object.</param>
     /// <param name="x">The x coordinate.</param>
     /// <param name="y">The y coordinate.</param>
-    public void AddBoardObject(BoardObject boardObject, int x, int y)
+    public void AddBoardObject(BoardObject boardObject, int x, int y, bool centerPos = true)
     {
         Tile t = GetTile(x, y);
         if (t != null)
         {
-            t.AddBoardObject(boardObject);
+            t.AddBoardObject(boardObject, centerPos);
         }
     }
 

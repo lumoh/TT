@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SwapController : MonoBehaviour 
 {
+    public bool Horizontal;
+    public bool Vertical;
+
     private Board _board;
     private Camera _camera;
     private Vector3 _origin;
@@ -45,19 +48,40 @@ public class SwapController : MonoBehaviour
         if(_down)
         {
             Vector3 current = _camera.ScreenToWorldPoint(Input.mousePosition);
-            float delta = Mathf.Abs(current.x - _origin.x);
-            if (delta > 0.3f)
+            if(Horizontal)
             {
-                if(current.x < _origin.x)
+                float delta = Mathf.Abs(current.x - _origin.x);
+                if(delta > 0.3f)
                 {
-                    _board.Swap(_blockToSwap.MyTile, _board.GetTile(_blockToSwap.X - 1, _blockToSwap.Y));
+                    if(current.x < _origin.x)
+                    {
+                        _board.Swap(_blockToSwap.MyTile, _board.GetTile(_blockToSwap.X - 1, _blockToSwap.Y));
+                    }
+                    else
+                    {
+                        _board.Swap(_blockToSwap.MyTile, _board.GetTile(_blockToSwap.X + 1, _blockToSwap.Y));
+                    }
+                    _down = false;
+                    _blockToSwap = null;
                 }
-                else
+            }
+
+            if(Vertical)
+            {
+                float delta = Mathf.Abs(current.y - _origin.y);
+                if(delta > 0.3f)
                 {
-                    _board.Swap(_blockToSwap.MyTile, _board.GetTile(_blockToSwap.X + 1, _blockToSwap.Y));
+                    if(current.y < _origin.y)
+                    {
+                        _board.Swap(_blockToSwap.MyTile, _board.GetTile(_blockToSwap.X, _blockToSwap.Y + 1));
+                    }
+                    else
+                    {
+                        _board.Swap(_blockToSwap.MyTile, _board.GetTile(_blockToSwap.X, _blockToSwap.Y - 1));
+                    }
+                    _down = false;
+                    _blockToSwap = null;
                 }
-                _down = false;
-                _blockToSwap = null;
             }
         }
 

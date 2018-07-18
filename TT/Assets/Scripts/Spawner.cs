@@ -9,7 +9,7 @@ public class Spawner : BoardObject
 {
     private string _spawnType;
 
-	public override void Start () 
+	public override void Start() 
     {
         State = BoardObjectState.NONE;
 	}
@@ -53,10 +53,10 @@ public class Spawner : BoardObject
                 if (boardObject != null)
                 {
                     boardObject.Init(ColorUtil.PickRandom(), TileLayer);
-                    MyBoard.AddBoardObject(boardObject, X, Y);
+                    MyBoard.AddBoardObject(boardObject, X, Y, false);
                     boardObject.transform.position = transform.position;
                     boardObject.transform.localScale = Vector3.zero;
-                    LeanTween.scale(boardObject.gameObject, Vector3.one, 0.5f).setEase(LeanTweenType.easeOutSine).setDelay(0.08f);
+                    LeanTween.scale(boardObject.gameObject, Vector3.one, 0.25f).setEase(LeanTweenType.easeOutSine);
                 }
             }
         }
