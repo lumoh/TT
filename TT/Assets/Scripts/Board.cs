@@ -272,7 +272,7 @@ public class Board : MonoBehaviour
 
             if(b1 != null)
             {
-                if(b2 == null || b2.CanSwap())
+                if((b2 == null || b2.CanSwap()) && b1.CanSwap())
                 {
                     swapB1 = true;
                 }
@@ -280,18 +280,29 @@ public class Board : MonoBehaviour
 
             if(b2 != null)
             {
-                if(b1 == null || b1.CanSwap())
+                if(b1 == null || b1.CanSwap() && b2.CanSwap())
                 {
                     swapB2 = true;
                 }
             }
 
-            if(swapB1)
+            if(swapB1 && swapB2)
             {
+                t1.AddBoardObject(b2, false);
+                t2.AddBoardObject(b1, false);
+                b1.Swap(t2);
+                b2.Swap(t1);
+            }
+            else if(swapB1 && !swapB2)
+            {
+                t1.RemoveBoardObject(b1.TileLayer);
+                t2.AddBoardObject(b1, false);
                 b1.Swap(t2);
             }
-            if(swapB2)
+            else if(swapB2 && !swapB1)
             {
+                t2.RemoveBoardObject(b2.TileLayer);
+                t1.AddBoardObject(b2, false);
                 b2.Swap(t1);
             }
 
@@ -300,59 +311,6 @@ public class Board : MonoBehaviour
                 _swapOnCooldown = false;
             });
         }
-    }
-
-    public void FallColumn(int x)
-    {
-        List<BoardObject> blocks = new List<BoardObject>();
-        float maxDropTime = 0;
-        for(int y = MaxY; y >= MinY; y--)
-        {
-            BoardObject boardObject = GetBoardObject(x, y);
-            if(boardObject != null && boardObject.State == BoardObjectState.SETTLED)
-            {
-                int tilesToDrop = 0;
-                for(int v = y + 1; v <= MaxY; v++)
-                {
-                    Tile checkTile = GetTile(x, v, true);
-                    if(checkTile != null)
-                    {
-                        if(!checkTile.IsOccupied(3))
-                        {
-                            tilesToDrop++;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                if(tilesToDrop > 0)
-                {
-                    blocks.Add(boardObject);
-                    boardObject.State = BoardObjectState.FALLING;
-                    boardObject.MyTile.RemoveBoardObject(boardObject.TileLayer);
-                    Tile destTile = GetTile(x, y + tilesToDrop, true);
-                    if(destTile != null)
-                    {
-                        destTile.AddBoardObject(boardObject, false);
-                        float dropTime = (float)tilesToDrop * 0.02f;
-                        maxDropTime = Mathf.Max(maxDropTime, dropTime);
-                        LeanTween.move(boardObject.gameObject, destTile.transform.position, dropTime);
-                    }
-                }
-            }
-        }
-
-        LeanTween.delayedCall(maxDropTime, ()=>
-        {
-            foreach(BoardObject block in blocks)
-            {
-                block.State = BoardObjectState.SETTLED;
-            }
-            FindMatches();
-        });
     }
 
     public void AddRandomBlock(string type, Tile tile)

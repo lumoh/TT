@@ -67,6 +67,8 @@ public class BoardObject : MonoBehaviour
 
     public float SwapSpeed = 0.2f;
 
+    private Vector3 _velocity;
+
     [Header("Sprite Settings")]
     public SpriteRenderer MySpriteRenderer;   
     public Sprite NONE;
@@ -92,7 +94,7 @@ public class BoardObject : MonoBehaviour
     public bool CanSwap()
     {
         bool settled = State == BoardObjectState.SETTLED;
-        return Swappable &&  settled && _active;
+        return Swappable && settled && _active;
     }
 
     public bool CanMatch()
@@ -103,16 +105,11 @@ public class BoardObject : MonoBehaviour
 
     public void Swap(Tile t)
     {
-        if(CanSwap())
+        State = BoardObjectState.SWAPPING;
+        LeanTween.move(gameObject, t.transform.position, 0.1f).setOnComplete(() =>
         {
-            MyTile.RemoveBoardObject(TileLayer);
-            State = BoardObjectState.SWAPPING;
-            LeanTween.move(gameObject, t.transform.position, 0.1f).setOnComplete(() =>
-            {
-                t.AddBoardObject(this);
-                State = BoardObjectState.SETTLED;
-            });
-        }
+            State = BoardObjectState.FALLING;
+        });
     }
 
     /// <summary>
@@ -128,7 +125,7 @@ public class BoardObject : MonoBehaviour
     }
 
     public virtual void Break()
-    {        
+    {
         SetActive(false);
         State = BoardObjectState.BREAKING;
 
@@ -154,32 +151,93 @@ public class BoardObject : MonoBehaviour
 
     protected virtual void setSpriteForColor()
     {
-        if (MySpriteRenderer != null)
+        if(MySpriteRenderer != null)
         {
-            if (_color == BoardObjectColor.RED)
+            if(_color == BoardObjectColor.RED)
             {
                 MySpriteRenderer.sprite = RED;
             }
-            else if (_color == BoardObjectColor.ORANGE)
+            else if(_color == BoardObjectColor.ORANGE)
             {
                 MySpriteRenderer.sprite = ORANGE;
             }
-            else if (_color == BoardObjectColor.YELLOW)
+            else if(_color == BoardObjectColor.YELLOW)
             {
                 MySpriteRenderer.sprite = YELLOW;
             }
-            else if (_color == BoardObjectColor.GREEN)
+            else if(_color == BoardObjectColor.GREEN)
             {
                 MySpriteRenderer.sprite = GREEN;
             }
-            else if (_color == BoardObjectColor.BLUE)
+            else if(_color == BoardObjectColor.BLUE)
             {
                 MySpriteRenderer.sprite = BLUE;
             }
-            else if (_color == BoardObjectColor.PURPLE)
+            else if(_color == BoardObjectColor.PURPLE)
             {
                 MySpriteRenderer.sprite = PURPLE;
             }
         }
+    }
+
+    void Update()
+    {
+        // board object is settled squarely on its tile
+        if(State == BoardObjectState.SETTLED)
+        {            
+            // if tile below becomes unoccupied, start falling again!
+            Tile tileBelow = getTileAdjacent(0, 1);
+            if(tileBelow != null && !tileBelow.IsOccupied(TileLayer))
+            {
+                State = BoardObjectState.FALLING;
+            }
+        }
+        // the board object is falling vertically down
+        else if(State == BoardObjectState.FALLING)
+        {
+            // if the board object has fallen further than the targeted tile
+            if(transform.position.y <= MyTile.transform.position.y)
+            {
+                Tile targetTile = getTileAdjacent(0, 1);
+                if(targetTile == null || (targetTile != null && targetTile.IsOccupied(TileLayer)))
+                {
+                    _velocity = Vector3.zero;
+                    transform.position = MyTile.transform.position;
+                    State = BoardObjectState.SETTLED;
+                    MyBoard.FindMatches();
+                }
+                // if not blocked then move to it
+                else if(targetTile != null)
+                {
+                    MyTile.RemoveBoardObject(TileLayer);
+                    targetTile.AddBoardObject(this);
+                    advanceFallingObject();
+                }
+            }
+            else
+            {
+                advanceFallingObject();
+            }
+        }
+    }
+
+    private void advanceFallingObject()
+    {
+        _velocity = new Vector3(0, -1, 0);
+        Vector3 newPos = transform.position + (_velocity * Time.deltaTime);
+        if (newPos.y < MyTile.transform.position.y)
+        {
+            newPos = MyTile.transform.position;
+        }
+        transform.position = newPos;
+    }
+
+    private Tile getTileAdjacent(int xoffset, int yoffset)
+    {
+        Tile tileBelow = null;
+        int x = X + xoffset;
+        int y = Y + yoffset;
+        tileBelow = MyBoard.GetTile(x, y);
+        return tileBelow;
     }
 }
