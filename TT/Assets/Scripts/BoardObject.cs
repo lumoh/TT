@@ -112,18 +112,6 @@ public class BoardObject : MonoBehaviour
         });
     }
 
-    /// <summary>
-    /// TEMP CONTROLLER
-    /// </summary>
-    public void OnMouseDown()
-    {
-        Tile adjacentTile = MyBoard.GetTile(X + 1, Y, true);
-        if (adjacentTile != null)
-        {
-            MyBoard.Swap(MyTile, adjacentTile);
-        }
-    }
-
     public virtual void Break()
     {
         SetActive(false);
@@ -204,7 +192,11 @@ public class BoardObject : MonoBehaviour
                     _velocity = Vector3.zero;
                     transform.position = MyTile.transform.position;
                     State = BoardObjectState.SETTLED;
-                    MyBoard.FindMatches();
+
+                    if(!isBlockAbove())
+                    {
+                        MyBoard.FindMatches();
+                    }
                 }
                 // if not blocked then move to it
                 else if(targetTile != null)
@@ -230,6 +222,25 @@ public class BoardObject : MonoBehaviour
             newPos = MyTile.transform.position;
         }
         transform.position = newPos;
+    }
+
+    private bool isBlockAbove()
+    {
+        bool flag = false;
+        for(int y = Y; y >= 0; y--)
+        {
+            Tile tile = MyBoard.GetTile(X, y);
+            if(tile != null)
+            {
+                BoardObject bo = tile.GetBoardObect(TileLayer);
+                if(bo != null && bo.State == BoardObjectState.FALLING)
+                {
+                    flag = true;
+                    break;
+                }
+            }
+        }
+        return flag;
     }
 
     private Tile getTileAdjacent(int xoffset, int yoffset)
