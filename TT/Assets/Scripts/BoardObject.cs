@@ -98,15 +98,16 @@ public class BoardObject : MonoBehaviour
     public bool CanMatch()
     {
         bool settled = State == BoardObjectState.SETTLED;
-        return Matchable && _active && settled;
+        return Matchable && settled && _active;
     }
 
     public void Swap(Tile t)
     {
         if(CanSwap())
         {
+            MyTile.RemoveBoardObject(TileLayer);
             State = BoardObjectState.SWAPPING;
-            LeanTween.move(gameObject, t.transform.position, 0.2f).setOnComplete(() =>
+            LeanTween.move(gameObject, t.transform.position, 0.1f).setOnComplete(() =>
             {
                 t.AddBoardObject(this);
                 State = BoardObjectState.SETTLED;
@@ -130,19 +131,16 @@ public class BoardObject : MonoBehaviour
     {        
         SetActive(false);
         State = BoardObjectState.BREAKING;
-        Tile tile = MyTile;
 
-        //LeanTween.delayedCall(gameObject, 2f, () =>
-        //{
-            Destroy(gameObject);
+        LeanTween.delayedCall(gameObject, 2f, () =>
+        {
             MyTile.RemoveBoardObject(TileLayer);
-            MyBoard.FallColumn(tile.X);
-        //});
+            Destroy(gameObject);
+        });
     }
 
     public virtual void OnDestroy()
     {
-        MyTile.RemoveBoardObject(TileLayer);
         LeanTween.cancel(gameObject);
     }
 

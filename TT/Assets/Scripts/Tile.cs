@@ -38,13 +38,16 @@ public class Tile : MonoBehaviour {
     /// </summary>
     /// <param name="boardObject">Board object.</param>
     /// <param name="layer">Layer.</param>
-    public void AddBoardObject(BoardObject boardObject)
+    public void AddBoardObject(BoardObject boardObject, bool centerPos = true)
     {
         if (_boardObjects != null && boardObject.TileLayer >= 0 && boardObject.TileLayer < NUM_LAYERS)
         {
             boardObject.MyTile = this;
             boardObject.transform.SetParent(transform);
-            boardObject.transform.localPosition = Vector3.zero;
+            if(centerPos)
+            {
+                boardObject.transform.localPosition = Vector3.zero;
+            }
             _boardObjects[boardObject.TileLayer] = boardObject;
         }
     }

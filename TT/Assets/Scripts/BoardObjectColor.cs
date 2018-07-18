@@ -16,6 +16,6 @@ public class ColorUtil
     public static BoardObjectColor PickRandom()
     {
         BoardObjectColor[] colors = (BoardObjectColor[])System.Enum.GetValues(typeof(BoardObjectColor));
-        return colors[Random.Range(3, colors.Length)];
+        return colors[Random.Range(2, colors.Length)];
     }
 }

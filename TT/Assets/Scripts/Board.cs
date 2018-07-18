@@ -63,7 +63,7 @@ public class Board : MonoBehaviour
         MatchFinder = new MatchFinder();
         BoardCamera.transform.localPosition = new Vector3(2.5f, -5.75f, -10);
         transform.localPosition = new Vector3(0, 0, 0);
-        Init(3, 5);
+        Init(6, 13);
 	}
 
     /// <summary>
@@ -79,13 +79,18 @@ public class Board : MonoBehaviour
         MinY = 0;
         MaxY = Height - 1;
 
-        QueuedRows = 0;
+        QueuedRows = 2;
 
         _tiles = new List<List<Tile>>();
         createTiles();
 
         // TEST
         addRandomBlocks();
+
+        LeanTween.delayedCall(0.5f, () =>
+        {
+            FindMatches();
+        });
     }
 
     /// <summary>
@@ -123,12 +128,12 @@ public class Board : MonoBehaviour
         {
             for (int x = 0; x < Width; x++)
             {
-                if (y >= 0)
+                if (y >= 4)
                 {
                     Tile tile = GetTile(x, y);
                     if (tile != null) 
                     {
-                        addRandomBlock("Block", tile);
+                        AddRandomBlock("Block", tile);
                     }
                 }
             }
@@ -249,6 +254,11 @@ public class Board : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Swap the specified t1 and t2.
+    /// </summary>
+    /// <param name="t1">T1.</param>
+    /// <param name="t2">T2.</param>
     public void Swap(Tile t1, Tile t2)
     {
         if(t1 != null && t2 != null && !_swapOnCooldown)
@@ -256,44 +266,46 @@ public class Board : MonoBehaviour
             BoardObject b1 = t1.GetBoardObect(3);
             BoardObject b2 = t2.GetBoardObect(3);
 
-            t1.RemoveBoardObject(3);
-            t2.RemoveBoardObject(3);
-
             _swapOnCooldown = true;
+            bool swapB1 = false;
+            bool swapB2 = false;
 
             if(b1 != null)
             {
-                b1.Swap(t2);
+                if(b2 == null || b2.CanSwap())
+                {
+                    swapB1 = true;
+                }
             }
 
-            if(b2 != null && b2.CanSwap())
+            if(b2 != null)
+            {
+                if(b1 == null || b1.CanSwap())
+                {
+                    swapB2 = true;
+                }
+            }
+
+            if(swapB1)
+            {
+                b1.Swap(t2);
+            }
+            if(swapB2)
             {
                 b2.Swap(t1);
             }
 
-            LeanTween.delayedCall(0.25f, () =>
+            LeanTween.delayedCall(0.12f, () =>
             {
                 _swapOnCooldown = false;
             });
         }
     }
 
-    private void swapSettled(BoardObject b1, BoardObject b2)
-    {
-        if(b1 != null)
-        {
-            b1.State = BoardObjectState.SETTLED;
-        }
-
-        if(b2 != null)
-        {
-            b2.State = BoardObjectState.SETTLED;
-        }
-    }
-
     public void FallColumn(int x)
     {
         List<BoardObject> blocks = new List<BoardObject>();
+        float maxDropTime = 0;
         for(int y = MaxY; y >= MinY; y--)
         {
             BoardObject boardObject = GetBoardObject(x, y);
@@ -324,21 +336,26 @@ public class Board : MonoBehaviour
                     Tile destTile = GetTile(x, y + tilesToDrop, true);
                     if(destTile != null)
                     {
-                        destTile.AddBoardObject(boardObject);
+                        destTile.AddBoardObject(boardObject, false);
+                        float dropTime = (float)tilesToDrop * 0.02f;
+                        maxDropTime = Mathf.Max(maxDropTime, dropTime);
+                        LeanTween.move(boardObject.gameObject, destTile.transform.position, dropTime);
                     }
                 }
             }
         }
-            
-        foreach(BoardObject block in blocks)
-        {
-            block.State = BoardObjectState.SETTLED;
-        }
 
-        FindMatches();
+        LeanTween.delayedCall(maxDropTime, ()=>
+        {
+            foreach(BoardObject block in blocks)
+            {
+                block.State = BoardObjectState.SETTLED;
+            }
+            FindMatches();
+        });
     }
 
-    private void addRandomBlock(string type, Tile tile)
+    public void AddRandomBlock(string type, Tile tile)
     {
         GameObject Prefab = Resources.Load<GameObject>(type);
         GameObject obj = Instantiate(Prefab);
