@@ -45,7 +45,7 @@ public class MatchFinder
         matched.Clear();
         MatchCombo matchCombo;
         
-        for (int y = 0; y < board.Height; y++) 
+        for (int y = board.MinY; y <= board.MaxY; y++) 
         {
             for(int x = 0; x < board.Width; x++)
             {
@@ -358,7 +358,7 @@ public class MatchFinder
                     int maxY;
 
                     // max tile width or tile height?
-                    minX = minY = Mathf.Max (board.Width, board.Height);
+                    minX = minY = Mathf.Max(board.Width, board.Height);
                     maxX = maxY = 0;
 
                     for (int i = 0; i < hMatches.Count; i++) 

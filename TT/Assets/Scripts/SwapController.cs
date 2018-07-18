@@ -45,7 +45,7 @@ public class SwapController : MonoBehaviour
             }
         }
 
-        if(_down)
+        if(_down && _blockToSwap != null && _board != null)
         {
             Vector3 current = _camera.ScreenToWorldPoint(Input.mousePosition);
             if(Horizontal)

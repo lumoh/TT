@@ -53,6 +53,11 @@ public class Board : MonoBehaviour
     /// </summary>
     private bool _swapOnCooldown = false;
 
+    /// <summary>
+    /// The velocity.
+    /// </summary>
+    private Vector3 _velocity;
+
 	/// <summary>
     /// initialize a board and setup camera
     /// </summary>
@@ -84,9 +89,8 @@ public class Board : MonoBehaviour
         _tiles = new List<List<Tile>>();
         createTiles();
 
-        // TEST
         addRandomBlocks();
-        addSpawners();
+        //addSpawners();
 
         LeanTween.delayedCall(0.5f, () =>
         {
@@ -232,7 +236,7 @@ public class Board : MonoBehaviour
     public bool InBounds(int x, int y)
     {
         bool flag = false;
-        if (x >= 0 && x < Width && y >= 0 && y < Height + QueuedRows)
+        if (x >= 0 && x < Width && y >= 0 && y <= MaxY + QueuedRows)
         {
             flag = true;
         }
@@ -352,6 +356,62 @@ public class Board : MonoBehaviour
                 spawner.Init(tile, spawnType, layer);
             }
             tile.AddSpawner(spawner);
+        }
+    }
+
+    /// <summary>
+    /// move board up
+    /// </summary>
+    void Update()
+    {
+        // slowly move board up
+        _velocity = new Vector3(0, 0.4f, 0) * Time.deltaTime;
+        Vector3 newPos = transform.position + _velocity;
+        transform.position = newPos;
+
+        int currentPos = Mathf.FloorToInt(newPos.y);
+        if(currentPos > MinY)
+        {
+            MinY++;
+            MaxY++;
+            for(int x = 0; x < Width; x++)
+            {
+                Tile tile = GetTile(x, MaxY);
+                if(tile != null)
+                {
+                    BoardObject bo = tile.GetBoardObect(3);
+                    if(bo != null)
+                    {
+                        bo.SetActive(true);
+                    }
+                }
+            }
+
+            List<Tile> row = new List<Tile>();
+            for (int x = 0; x < Width; x++)
+            {
+                GameObject TilePrefab = Resources.Load<GameObject>("Tile");
+                GameObject tileObj = Instantiate(TilePrefab);
+                if (tileObj != null)
+                {
+                    Tile tile = tileObj.GetComponent<Tile>();
+                    if (tile != null)
+                    {
+                        tile.Init(this, x, MaxY + 2);
+                        row.Add(tile);
+                    }
+                }
+            }
+            _tiles.Add(row);
+
+            for(int x = 0; x < Width; x++)
+            {
+                Tile tile = GetTile(x, MaxY + 2);
+                if(tile != null)
+                {
+                    AddRandomBlock("Block", tile);
+                }
+            }
         }
     }
 }

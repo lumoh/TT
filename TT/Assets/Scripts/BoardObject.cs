@@ -132,7 +132,14 @@ public class BoardObject : MonoBehaviour
     public void SetActive(bool active)
     {
         Color c = MySpriteRenderer.color;
-        c.a = 0.25f;
+        if(!active)
+        {
+            c.a = 0.25f;
+        }
+        else
+        {
+            c.a = 1f;
+        }
         MySpriteRenderer.color = c;
         _active = active;
     }
@@ -170,50 +177,53 @@ public class BoardObject : MonoBehaviour
 
     void Update()
     {
-        if(transform.position.y > MyTile.transform.position.y)
+        if(MyTile != null)
         {
-            State = BoardObjectState.FALLING;
-        }
-
-        // board object is settled squarely on its tile
-        if(State == BoardObjectState.SETTLED)
-        {            
-            // if tile below becomes unoccupied, start falling again!
-            Tile tileBelow = getTileAdjacent(0, 1);
-            if(tileBelow != null && !tileBelow.IsOccupied(TileLayer))
+            if(transform.position.y > MyTile.transform.position.y)
             {
                 State = BoardObjectState.FALLING;
             }
-        }
-        // the board object is falling vertically down
-        else if(State == BoardObjectState.FALLING)
-        {
-            // if the board object has fallen further than the targeted tile
-            if(transform.position.y <= MyTile.transform.position.y)
-            {
-                Tile targetTile = getTileAdjacent(0, 1);
-                if(targetTile == null || (targetTile != null && targetTile.IsOccupied(TileLayer)))
-                {
-                    _velocity = Vector3.zero;
-                    transform.position = MyTile.transform.position;
-                    State = BoardObjectState.SETTLED;
 
-                    if(!isBlockAbove())
-                    {
-                        MyBoard.FindMatches();
-                    }
-                }
-                // if not blocked then move to it
-                else if(targetTile != null)
+            // board object is settled squarely on its tile
+            if(State == BoardObjectState.SETTLED)
+            {
+                // if tile below becomes unoccupied, start falling again!
+                Tile tileBelow = getTileAdjacent(0, 1);
+                if(tileBelow != null && !tileBelow.IsOccupied(TileLayer))
                 {
-                    MyTile.RemoveBoardObject(TileLayer);
-                    targetTile.AddBoardObject(this, false);
-                    advanceFallingObject();
+                    State = BoardObjectState.FALLING;
                 }
             }
-            else
+            // the board object is falling vertically down
+            else if(State == BoardObjectState.FALLING)
             {
-                advanceFallingObject();
+                // if the board object has fallen further than the targeted tile
+                if(transform.position.y <= MyTile.transform.position.y)
+                {
+                    Tile targetTile = getTileAdjacent(0, 1);
+                    if(targetTile == null || (targetTile != null && targetTile.IsOccupied(TileLayer)))
+                    {
+                        _velocity = Vector3.zero;
+                        transform.position = MyTile.transform.position;
+                        State = BoardObjectState.SETTLED;
+
+                        if(!isBlockAbove())
+                        {
+                            MyBoard.FindMatches();
+                        }
+                    }
+                    // if not blocked then move to it
+                    else if(targetTile != null)
+                    {
+                        MyTile.RemoveBoardObject(TileLayer);
+                        targetTile.AddBoardObject(this, false);
+                        advanceFallingObject();
+                    }
+                }
+                else
+                {
+                    advanceFallingObject();
+                }
             }
         }
     }
