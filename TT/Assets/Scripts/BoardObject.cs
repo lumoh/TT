@@ -39,7 +39,7 @@ public class BoardObject : MonoBehaviour
     [Header("Board Settings")]
     public int TileLayer;
 
-    [HideInInspector] public BoardObjectState State = BoardObjectState.SETTLED;
+    public BoardObjectState State = BoardObjectState.SETTLED;
 
     [SerializeField] private BoardObjectColor _color = BoardObjectColor.NONE;
     public BoardObjectColor Color 
@@ -209,7 +209,7 @@ public class BoardObject : MonoBehaviour
 
                         if(!isBlockAbove())
                         {
-                            MyBoard.FindMatches();
+                            MyBoard.BreakMatches();
                         }
                     }
                     // if not blocked then move to it

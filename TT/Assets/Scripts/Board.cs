@@ -41,7 +41,7 @@ public class Board : MonoBehaviour
     /// <summary>
     /// num rows to queue up
     /// </summary>
-    public int QueuedRows;
+    private int _queuedRows;
 
     /// <summary>
     /// The tiles.
@@ -88,18 +88,12 @@ public class Board : MonoBehaviour
 
         MinY = 0;
         MaxY = Height - 1;
-
-        QueuedRows = 2;
+        _queuedRows = 2;
 
         _tiles = new List<List<Tile>>();
         createTiles();
 
         addRandomBlocks();
-
-        LeanTween.delayedCall(0.5f, () =>
-        {
-            FindMatches();
-        });
     }
 
     /// <summary>
@@ -107,7 +101,7 @@ public class Board : MonoBehaviour
     /// </summary>
     private void createTiles()
     {
-        for (int y = 0; y < Height + QueuedRows; y++)
+        for (int y = 0; y < Height + _queuedRows; y++)
         {
             List<Tile> row = new List<Tile>();
             for (int x = 0; x < Width; x++)
@@ -133,22 +127,33 @@ public class Board : MonoBehaviour
     /// </summary>
     private void addRandomBlocks()
     {
-        for (int y = 0; y < Height + QueuedRows; y++)
+        for (int y = 0; y < Height + _queuedRows; y++)
         {
             for (int x = 0; x < Width; x++)
             {
-                if(y > 4)
+                if(y > 6)
                 {
                     Tile tile = GetTile(x, y);
                     if(tile != null)
                     {
                         AddRandomBlock("Block", tile);
+
+                        while(MatchExists())
+                        {
+                            BoardObject bo = tile.GetBoardObect(3);
+                            tile.RemoveBoardObject(3);
+                            Destroy(bo.gameObject);
+                            AddRandomBlock("Block", tile);
+                        }
                     }
                 }
             }
         }
     }
 
+    /// <summary>
+    /// Adds the spawners.
+    /// </summary>
     private void addSpawners()
     {
         for (int x = 0; x < Width; x++)
@@ -243,7 +248,7 @@ public class Board : MonoBehaviour
     public bool InBounds(int x, int y)
     {
         bool flag = false;
-        if (x >= 0 && x < Width && y >= 0 && y <= MaxY + QueuedRows)
+        if (x >= 0 && x < Width && y >= 0 && y <= MaxY + _queuedRows)
         {
             flag = true;
         }
@@ -254,7 +259,7 @@ public class Board : MonoBehaviour
     /// Finds the matches.
     /// </summary>
     /// <returns><c>true</c>, if matches was found, <c>false</c> otherwise.</returns>
-    public bool FindMatches()
+    public bool BreakMatches()
     {
         List<MatchCombo> matchCombos = MatchFinder.GetAllMatchesOnBoard(this);
         if (matchCombos.Count == 0)
@@ -274,6 +279,16 @@ public class Board : MonoBehaviour
                     _scrollingDelay = delay;
                 }
             }
+        }
+        return true;
+    }
+
+    public bool MatchExists()
+    {
+        List<MatchCombo> matchCombos = MatchFinder.GetAllMatchesOnBoard(this);
+        if (matchCombos.Count == 0)
+        {
+            return false;
         }
         return true;
     }
@@ -337,6 +352,11 @@ public class Board : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Adds the random block.
+    /// </summary>
+    /// <param name="type">Type.</param>
+    /// <param name="tile">Tile.</param>
     public void AddRandomBlock(string type, Tile tile)
     {
         GameObject Prefab = Resources.Load<GameObject>(type);
@@ -354,6 +374,12 @@ public class Board : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Adds the spawner.
+    /// </summary>
+    /// <param name="tile">Tile.</param>
+    /// <param name="spawnType">Spawn type.</param>
+    /// <param name="layer">Layer.</param>
     private void addSpawner(Tile tile, string spawnType, int layer)
     {
         GameObject Prefab = Resources.Load<GameObject>("Spawner");
@@ -375,7 +401,6 @@ public class Board : MonoBehaviour
     void Update()
     {
         _scrollingDelay -= Time.deltaTime;
-
         if(_scrollingDelay <= 0)
         {
             _velocity = new Vector3(0, 0.1f, 0) * Time.deltaTime;
@@ -385,46 +410,55 @@ public class Board : MonoBehaviour
             int currentPos = Mathf.FloorToInt(newPos.y);
             if(currentPos > MinY)
             {
-                MinY++;
-                MaxY++;
-                for(int x = 0; x < Width; x++)
-                {
-                    Tile tile = GetTile(x, MaxY);
-                    if(tile != null)
-                    {
-                        BoardObject bo = tile.GetBoardObect(3);
-                        if(bo != null)
-                        {
-                            bo.SetActive(true);
-                        }
-                    }
-                }
+                activateNewRow();
+            }
+        }
+    }
 
-                List<Tile> row = new List<Tile>();
-                for(int x = 0; x < Width; x++)
+    /// <summary>
+    /// Activate the new row.
+    /// </summary>
+    private void activateNewRow()
+    {
+        MinY++;
+        MaxY++;
+        for(int x = 0; x < Width; x++)
+        {
+            Tile tile = GetTile(x, MaxY);
+            if(tile != null)
+            {
+                BoardObject bo = tile.GetBoardObect(3);
+                if(bo != null)
                 {
-                    GameObject TilePrefab = Resources.Load<GameObject>("Tile");
-                    GameObject tileObj = Instantiate(TilePrefab);
-                    if(tileObj != null)
-                    {
-                        Tile tile = tileObj.GetComponent<Tile>();
-                        if(tile != null)
-                        {
-                            tile.Init(this, x, MaxY + 2);
-                            row.Add(tile);
-                        }
-                    }
+                    bo.SetActive(true);
                 }
-                _tiles.Add(row);
+            }
+        }
 
-                for(int x = 0; x < Width; x++)
+        // add new row to bottom
+        List<Tile> row = new List<Tile>();
+        for(int x = 0; x < Width; x++)
+        {
+            GameObject TilePrefab = Resources.Load<GameObject>("Tile");
+            GameObject tileObj = Instantiate(TilePrefab);
+            if(tileObj != null)
+            {
+                Tile tile = tileObj.GetComponent<Tile>();
+                if(tile != null)
                 {
-                    Tile tile = GetTile(x, MaxY + 2);
-                    if(tile != null)
-                    {
-                        AddRandomBlock("Block", tile);
-                    }
+                    tile.Init(this, x, MaxY + 2);
+                    row.Add(tile);
                 }
+            }
+        }
+        _tiles.Add(row);
+
+        for(int x = 0; x < Width; x++)
+        {
+            Tile tile = GetTile(x, MaxY + 2);
+            if(tile != null)
+            {
+                AddRandomBlock("Block", tile);
             }
         }
     }
