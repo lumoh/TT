@@ -83,13 +83,20 @@ public class Board : MonoBehaviour
     /// </summary>
 	void Start () 
     {
+        int width = 6;
+        int height = 13;
+
         Application.targetFrameRate = 60;
         LeanTween.init(1000);
 
         MatchFinder = new MatchFinder();
-        BoardCamera.transform.localPosition = new Vector3(2.5f, -5.75f, -10);
+
+        float xPos = ((float)width - 1) / 2f;
+        float yPos = (13 - height) + -5.6f;
+        BoardCamera.transform.localPosition = new Vector3(xPos, yPos, -10);
         transform.localPosition = new Vector3(0, 0, 0);
-        Init(6, 13);
+
+        Init(width, height);
 	}
 
     /// <summary>
