@@ -91,12 +91,14 @@ public class Board : MonoBehaviour
 
         MatchFinder = new MatchFinder();
 
-        float xPos = ((float)width - 1) / 2f;
-        float yPos = (13 - height) + -5.6f;
+        float xPos = 1;
+        float yPos = -5.6f;
         BoardCamera.transform.localPosition = new Vector3(xPos, yPos, -10);
         transform.localPosition = new Vector3(0, 0, 0);
 
         Init(width, height);
+
+        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
 	}
 
     /// <summary>
@@ -477,10 +479,11 @@ public class Board : MonoBehaviour
                         {
                             breakObj.Break(1f);
                         }
-                    } 
+                    }
                 }
                 _velocity = Vector3.zero;
                 _gameOver = true;
+                GameEventManager.TriggerEvent(GameEventType.GAME_LOST);
             }
         }
         return flag;
@@ -542,5 +545,11 @@ public class Board : MonoBehaviour
         }
 
         BreakMatches();
+    }
+
+    private void handleGameWon(object param)
+    {
+        _gameOver = true;
+        // DO OTHER WIN GAME THING
     }
 }

@@ -125,7 +125,7 @@ public class BoardObject : MonoBehaviour
             // do animation
             gameObject.SetActive(false);
 
-            //breakParticles();
+            GameEventManager.TriggerEvent(GameEventType.BREAK_BLOCK, this);
         });
 
         LeanTween.delayedCall(gameObject, trueDelay, () =>
