@@ -17,7 +17,6 @@ public class Board : MonoBehaviour
     /// </summary>
     public Camera BoardCamera;
 
-    [Header("Board Dimensions")]
     /// <summary>
     /// num blocks vertical
     /// </summary>
@@ -27,6 +26,26 @@ public class Board : MonoBehaviour
     /// num block horizontal
     /// </summary>
     public int Width;
+
+    /// <summary>
+    /// does the board freeze movement when break occurs
+    /// </summary>
+    public bool IsBreakDelay;
+
+    /// <summary>
+    /// current speed
+    /// </summary>
+    public float Speed;
+
+    /// <summary>
+    /// amount to speed up each line
+    /// </summary>
+    public float SpeedUpAmount;
+
+    /// <summary>
+    /// speed when forcing speed up
+    /// </summary>
+    public float ForceSpeed;
 
     /// <summary>
     /// The minimum playable y range
@@ -59,11 +78,6 @@ public class Board : MonoBehaviour
     private Vector3 _velocity;
 
     /// <summary>
-    /// The speed up velocity.
-    /// </summary>
-    private Vector3 _speedUpVelocity;
-
-    /// <summary>
     /// The speeding up.
     /// </summary>
     private bool _speedingUp;
@@ -83,22 +97,15 @@ public class Board : MonoBehaviour
     /// </summary>
 	void Start () 
     {
-        int width = 6;
-        int height = 13;
-
+        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
         Application.targetFrameRate = 60;
         LeanTween.init(1000);
-
         MatchFinder = new MatchFinder();
 
-        float xPos = 1;
-        float yPos = -5.6f;
-        BoardCamera.transform.localPosition = new Vector3(xPos, yPos, -10);
+        BoardCamera.transform.localPosition = new Vector3(1, -5.6f, -10);
         transform.localPosition = new Vector3(0, 0, 0);
 
-        Init(width, height);
-
-        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
+        Init();
 	}
 
     /// <summary>
@@ -106,11 +113,8 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <param name="width">Width.</param>
     /// <param name="height">Height.</param>
-    public void Init(int width, int height)
+    public void Init()
     {
-        Height = height;
-        Width = width;
-
         MinY = 0;
         MaxY = Height - 1;
         _queuedRows = 2;
@@ -118,8 +122,7 @@ public class Board : MonoBehaviour
         _tiles = new List<List<Tile>>();
         createTiles();
 
-        _velocity = new Vector3(0, 0.1f, 0);
-        _speedUpVelocity = new Vector3(0, 2f, 0);
+        _velocity = new Vector3(0, Speed, 0);
         _speedingUp = false;
 
         addRandomBlocks();
@@ -304,7 +307,11 @@ public class Board : MonoBehaviour
                 {
                     float delay = 1.2f + ((float)j * 0.15f);
                     boardObject.Break(delay);
-                    _scrollingDelay = delay;
+
+                    if(IsBreakDelay)
+                    {
+                        _scrollingDelay = delay;
+                    }
                 }
             }
         }
@@ -439,7 +446,7 @@ public class Board : MonoBehaviour
             Vector3 velocity = _velocity;
             if(_speedingUp)
             {
-                velocity = _speedUpVelocity;
+                velocity = new Vector3(0, ForceSpeed, 0);
             }
             Vector3 newPos = transform.position + (velocity * Time.deltaTime);
             transform.position = newPos;
@@ -502,7 +509,7 @@ public class Board : MonoBehaviour
         MinY++;
         MaxY++;
 
-        _velocity += new Vector3(0, 0.05f, 0);
+        _velocity += new Vector3(0, SpeedUpAmount, 0);
 
         for(int x = 0; x < Width; x++)
         {
