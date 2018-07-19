@@ -477,17 +477,6 @@ public class Board : MonoBehaviour
             if(bo != null)
             {
                 flag = true;
-                for(int y = MinY; y <= MaxY + _queuedRows; y++)
-                {
-                    for(int xx = 0; xx < Width; xx++)
-                    {
-                        BoardObject breakObj = GetBoardObject(xx, y);
-                        if(breakObj != null)
-                        {
-                            breakObj.Break(1f);
-                        }
-                    }
-                }
                 _velocity = Vector3.zero;
                 _gameOver = true;
                 GameEventManager.TriggerEvent(GameEventType.GAME_LOST);
