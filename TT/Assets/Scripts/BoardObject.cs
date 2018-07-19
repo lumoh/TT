@@ -85,6 +85,8 @@ public class BoardObject : MonoBehaviour
 	public virtual void Start() 
     {
         State = BoardObjectState.SETTLED;
+        GameEventManager.RegisterForEvent(GameEventType.GAME_LOST, handleLoss);
+        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleWon);
 	}
 
     public virtual void Init(BoardObjectColor c, int tileLayer)
@@ -115,24 +117,22 @@ public class BoardObject : MonoBehaviour
         });
     }
 
-    public virtual void Break(float animDelay, float trueDelay = 1.65f)
+    public virtual void Break(float animDelay)
     {
         SetActive(false);
         State = BoardObjectState.BREAKING;
 
         LeanTween.delayedCall(gameObject, animDelay, () =>
         {
-            // do animation
             gameObject.SetActive(false);
-
             GameEventManager.TriggerEvent(GameEventType.BREAK_BLOCK, this);
-        });
 
-        LeanTween.delayedCall(gameObject, trueDelay, () =>
-        {
-            MyTile.RemoveBoardObject(TileLayer);
-            Destroy(gameObject);
-        });
+            LeanTween.delayedCall(gameObject, 0.15f, () =>
+            {
+                MyTile.RemoveBoardObject(TileLayer);
+                Destroy(gameObject);
+            });
+        });            
     }
 
     private void breakParticles()
@@ -143,6 +143,16 @@ public class BoardObject : MonoBehaviour
         {
             obj.transform.position = transform.position;
         }
+    }
+
+    private void handleWon(object param)
+    {
+        SetActive(false);
+    }
+
+    private void handleLoss(object param)
+    {
+        SetActive(false);
     }
 
     public virtual void OnDestroy()
