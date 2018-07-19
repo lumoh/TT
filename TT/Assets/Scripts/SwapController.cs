@@ -61,7 +61,7 @@ public class SwapController : MonoBehaviour
             }
         }
 
-        if(_down && _blockToSwap != null && _board != null)
+        if(_down && _blockToSwap != null && _board != null && _blockToSwap.MyTile != null)
         {
             Vector3 current = _camera.ScreenToWorldPoint(Input.mousePosition);
             if(Horizontal)
