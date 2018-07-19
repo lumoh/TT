@@ -69,6 +69,8 @@ public class BoardObject : MonoBehaviour
 
     private Vector3 _velocity;
 
+    [HideInInspector] public int SwapCount = 0;
+
     [Header("Sprite Settings")]
     public SpriteRenderer MySpriteRenderer;   
     public Sprite NONE;
@@ -105,6 +107,7 @@ public class BoardObject : MonoBehaviour
 
     public void Swap(Tile t)
     {
+        SwapCount++;
         State = BoardObjectState.SWAPPING;
         LeanTween.move(gameObject, t.transform.position, 0.1f).setOnComplete(() =>
         {
@@ -211,6 +214,8 @@ public class BoardObject : MonoBehaviour
                         {
                             MyBoard.BreakMatches();
                         }
+
+                        resetSwapCount();
                     }
                     // if not blocked then move to it
                     else if(targetTile != null)
@@ -225,6 +230,14 @@ public class BoardObject : MonoBehaviour
                     advanceFallingObject();
                 }
             }
+        }
+    }
+
+    private void resetSwapCount()
+    {
+        if(_active)
+        {
+            SwapCount = 0;
         }
     }
 

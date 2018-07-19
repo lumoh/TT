@@ -24,6 +24,22 @@ public class SwapController : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            if(_board != null)
+            {
+                _board.SpeedUp(true);
+            }
+        }
+
+        if(Input.GetKeyUp(KeyCode.Space))
+        {
+            if(_board != null)
+            {
+                _board.SpeedUp(false);
+            }
+        }
+
         if(Input.GetMouseButtonDown(0))
         {
             _origin = _camera.ScreenToWorldPoint(Input.mousePosition);

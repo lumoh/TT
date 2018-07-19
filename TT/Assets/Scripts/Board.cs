@@ -31,12 +31,12 @@ public class Board : MonoBehaviour
     /// <summary>
     /// The minimum playable y range
     /// </summary>
-    public int MinY;
+    [HideInInspector] public int MinY;
 
     /// <summary>
     /// The max playable y range
     /// </summary>
-    public int MaxY;
+    [HideInInspector] public int MaxY;
 
     /// <summary>
     /// num rows to queue up
@@ -59,9 +59,24 @@ public class Board : MonoBehaviour
     private Vector3 _velocity;
 
     /// <summary>
+    /// The speed up velocity.
+    /// </summary>
+    private Vector3 _speedUpVelocity;
+
+    /// <summary>
+    /// The speeding up.
+    /// </summary>
+    private bool _speedingUp;
+
+    /// <summary>
     /// The scrolling delay.
     /// </summary>
     private float _scrollingDelay = 0f;
+
+    /// <summary>
+    /// The game over.
+    /// </summary>
+    private bool _gameOver = false;
 
 	/// <summary>
     /// initialize a board and setup camera
@@ -92,6 +107,10 @@ public class Board : MonoBehaviour
 
         _tiles = new List<List<Tile>>();
         createTiles();
+
+        _velocity = new Vector3(0, 0.1f, 0);
+        _speedUpVelocity = new Vector3(0, 2f, 0);
+        _speedingUp = false;
 
         addRandomBlocks();
     }
@@ -273,11 +292,10 @@ public class Board : MonoBehaviour
                 BoardObject boardObject = matchCombos[i].matches[j];
                 if(boardObject != null)
                 {
-                    float delay = 1.8f + ((float)j * 0.1f);
+                    float delay = 1.3f + ((float)j * 0.1f);
                     boardObject.Break(delay);
-
                     _scrollingDelay = delay;
-                }
+                }                    
             }
         }
         return true;
@@ -400,11 +418,20 @@ public class Board : MonoBehaviour
     /// </summary>
     void Update()
     {
+        if(_gameOver)
+        {
+            return;
+        }
+
         _scrollingDelay -= Time.deltaTime;
         if(_scrollingDelay <= 0)
         {
-            _velocity = new Vector3(0, 0.1f, 0) * Time.deltaTime;
-            Vector3 newPos = transform.position + _velocity;
+            Vector3 velocity = _velocity;
+            if(_speedingUp)
+            {
+                velocity = _speedUpVelocity;
+            }
+            Vector3 newPos = transform.position + (velocity * Time.deltaTime);
             transform.position = newPos;
 
             int currentPos = Mathf.FloorToInt(newPos.y);
@@ -415,13 +442,57 @@ public class Board : MonoBehaviour
         }
     }
 
+    public void SpeedUp(bool active)
+    {
+        _speedingUp = active;
+    }
+
+    /// <summary>
+    /// Check for game over
+    /// </summary>
+    /// <returns><c>true</c>, if game over was checked, <c>false</c> otherwise.</returns>
+    private bool checkGameOver()
+    {
+        bool flag = false;
+        for(int x = 0; x < Width; x++)
+        {
+            BoardObject bo = GetBoardObject(x, MinY);
+            if(bo != null)
+            {
+                flag = true;
+                for(int y = MinY; y <= MaxY + 1; y++)
+                {
+                    for(int xx = 0; xx < Width; xx++)
+                    {
+                        BoardObject breakObj = GetBoardObject(xx, y);
+                        if(breakObj != null)
+                        {
+                            breakObj.Break();
+                        }
+                    } 
+                }
+                _velocity = Vector3.zero;
+                _gameOver = true;
+            }
+        }
+        return flag;
+    }
+
     /// <summary>
     /// Activate the new row.
     /// </summary>
     private void activateNewRow()
     {
+        if(checkGameOver())
+        {
+            return;
+        }
+
         MinY++;
         MaxY++;
+
+        _velocity += new Vector3(0, 0.05f, 0);
+
         for(int x = 0; x < Width; x++)
         {
             Tile tile = GetTile(x, MaxY);
@@ -461,5 +532,7 @@ public class Board : MonoBehaviour
                 AddRandomBlock("Block", tile);
             }
         }
+
+        BreakMatches();
     }
 }
