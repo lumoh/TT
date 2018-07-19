@@ -124,6 +124,8 @@ public class BoardObject : MonoBehaviour
         {
             // do animation
             gameObject.SetActive(false);
+
+            //breakParticles();
         });
 
         LeanTween.delayedCall(gameObject, trueDelay, () =>
@@ -131,6 +133,16 @@ public class BoardObject : MonoBehaviour
             MyTile.RemoveBoardObject(TileLayer);
             Destroy(gameObject);
         });
+    }
+
+    private void breakParticles()
+    {
+        GameObject Prefab = Resources.Load<GameObject>("BreakParticles");
+        GameObject obj = Instantiate(Prefab);
+        if (obj != null)
+        {
+            obj.transform.position = transform.position;
+        }
     }
 
     public virtual void OnDestroy()
