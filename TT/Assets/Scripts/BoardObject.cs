@@ -243,7 +243,7 @@ public class BoardObject : MonoBehaviour
 
     private void advanceFallingObject()
     {
-        _velocity += new Vector3(0, -2f, 0) * Time.deltaTime;
+        _velocity += new Vector3(0, -3f, 0) * Time.deltaTime;
         Vector3 newPos = transform.position + _velocity;
         if (newPos.y < MyTile.transform.position.y)
         {

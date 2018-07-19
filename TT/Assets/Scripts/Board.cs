@@ -460,7 +460,7 @@ public class Board : MonoBehaviour
             if(bo != null)
             {
                 flag = true;
-                for(int y = MinY; y <= MaxY + 1; y++)
+                for(int y = MinY; y <= MaxY + _queuedRows; y++)
                 {
                     for(int xx = 0; xx < Width; xx++)
                     {
