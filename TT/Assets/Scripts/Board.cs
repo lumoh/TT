@@ -84,6 +84,7 @@ public class Board : MonoBehaviour
 	void Start () 
     {
         Application.targetFrameRate = 60;
+        LeanTween.init(1000);
 
         MatchFinder = new MatchFinder();
         BoardCamera.transform.localPosition = new Vector3(2.5f, -5.75f, -10);
@@ -292,10 +293,10 @@ public class Board : MonoBehaviour
                 BoardObject boardObject = matchCombos[i].matches[j];
                 if(boardObject != null)
                 {
-                    float delay = 1.3f + ((float)j * 0.1f);
+                    float delay = 1.2f + ((float)j * 0.15f);
                     boardObject.Break(delay);
                     _scrollingDelay = delay;
-                }                    
+                }
             }
         }
         return true;
@@ -467,7 +468,7 @@ public class Board : MonoBehaviour
                         BoardObject breakObj = GetBoardObject(xx, y);
                         if(breakObj != null)
                         {
-                            breakObj.Break();
+                            breakObj.Break(1f);
                         }
                     } 
                 }
