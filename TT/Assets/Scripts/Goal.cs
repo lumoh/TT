@@ -28,6 +28,7 @@ public class Goal : MonoBehaviour
 
     public void Reset()
     {
+        Complete = false;
         Amount = 10;
         if(_amountText != null)
         {
