@@ -8,7 +8,8 @@ public enum GameEventType
 {
     GAME_WON,
     GAME_LOST,
-    BREAK_BLOCK
+    BREAK_BLOCK,
+    RESTART
 };
 
 /// <summary>

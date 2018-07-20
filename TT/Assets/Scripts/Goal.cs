@@ -25,5 +25,14 @@ public class Goal : MonoBehaviour
             _amountText.text = Amount.ToString();
         }
     }
+
+    public void Reset()
+    {
+        Amount = 10;
+        if(_amountText != null)
+        {
+            _amountText.text = Amount.ToString();
+        }
+    }
 }
 

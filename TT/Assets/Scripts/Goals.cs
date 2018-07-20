@@ -10,6 +10,7 @@ public class Goals : MonoBehaviour
     void Start()
     {
         GameEventManager.RegisterForEvent(GameEventType.BREAK_BLOCK, handleBreakBlock);
+        GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
 	}
 
     private void handleBreakBlock(object param)
@@ -23,6 +24,17 @@ public class Goals : MonoBehaviour
         if(GoalsComplete())
         {
             GameEventManager.TriggerEvent(GameEventType.GAME_WON);
+        }
+    }
+
+    private void handleRestart(object param)
+    {
+        foreach(Goal goal in GoalList)
+        {
+            if(goal != null)
+            {
+                goal.Reset();
+            }
         }
     }
 

@@ -98,10 +98,15 @@ public class Board : MonoBehaviour
 	void Start () 
     {
         GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
+        GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
         Application.targetFrameRate = 60;
         LeanTween.init(1000);
         MatchFinder = new MatchFinder();
 
+        if(BoardCamera == null)
+        {
+            BoardCamera = GameObject.Find("BoardCamera").GetComponent<Camera>();
+        }
         BoardCamera.transform.localPosition = new Vector3(1, -5.6f, -10);
         transform.localPosition = new Vector3(0, 0, 0);
 
@@ -546,6 +551,12 @@ public class Board : MonoBehaviour
     private void handleGameWon(object param)
     {
         _gameOver = true;
-        // DO OTHER WIN GAME THING
+    }
+
+    private void handleRestart(object param)
+    {
+        GameObject BoardPrefab = Resources.Load<GameObject>("Board");
+        GameObject newBoard = Instantiate(BoardPrefab);
+        Destroy(gameObject);
     }
 }

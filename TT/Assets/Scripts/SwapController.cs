@@ -14,7 +14,7 @@ public class SwapController : MonoBehaviour
     private BoardObject _blockToSwap = null;
 
 	// Use this for initialization
-    void Awake()
+    void Start()
     {
         _board = GetComponent<Board>();	
         _camera = _board.BoardCamera;
@@ -24,6 +24,11 @@ public class SwapController : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
+        if(_camera == null)
+        {
+            _camera = _board.BoardCamera;
+        }
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
             if(_board != null)
