@@ -49,7 +49,7 @@ public class Goals : MonoBehaviour
                     bo.transform.SetParent(null);
 
                     Vector3 goalPos = goal.transform.position;
-                    LeanTween.scale(bo.gameObject, Vector3.one * 0.6f, 0.8f);
+                    LeanTween.scale(bo.gameObject, Vector3.one * 0.6f, 0.8f).setEase(LeanTweenType.easeInBack);
                     LeanTween.move(bo.gameObject, goalPos, 0.8f).setOnComplete(() =>
                     {
                         Destroy(bo.gameObject);
@@ -65,7 +65,7 @@ public class Goals : MonoBehaviour
                                 GameEventManager.TriggerEvent(GameEventType.GAME_WON);
                             }
                         }
-                    });
+                    }).setEase(LeanTweenType.easeInBack);
                 }
             }
         }
@@ -88,5 +88,12 @@ public class Goals : MonoBehaviour
             }
         }
         return complete;
+    }
+
+    void OnDestroy()
+    {
+        LeanTween.cancel(gameObject);
+        GameEventManager.UnRegisterForEvent(GameEventType.BREAK_BLOCK, handleBreakBlock);
+        GameEventManager.UnRegisterForEvent(GameEventType.RESTART, handleRestart);
     }
 }

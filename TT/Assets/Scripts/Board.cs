@@ -95,10 +95,11 @@ public class Board : MonoBehaviour
 	/// <summary>
     /// initialize a board and setup camera
     /// </summary>
-	void Start () 
+	void Start ()
     {
         GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
         GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
+
         Application.targetFrameRate = 60;
         LeanTween.init(1000);
         MatchFinder = new MatchFinder();
@@ -558,5 +559,12 @@ public class Board : MonoBehaviour
         GameObject BoardPrefab = Resources.Load<GameObject>("Board");
         Instantiate(BoardPrefab);
         Destroy(gameObject);
+    }
+
+    void OnDestroy()
+    {
+        LeanTween.cancel(gameObject);
+        GameEventManager.UnRegisterForEvent(GameEventType.GAME_WON, handleGameWon);
+        GameEventManager.UnRegisterForEvent(GameEventType.RESTART, handleRestart);
     }
 }
