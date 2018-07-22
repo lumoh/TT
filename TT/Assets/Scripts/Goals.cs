@@ -20,11 +20,6 @@ public class Goals : MonoBehaviour
         {
             GoalCheck(bo);
         }
-
-        if(GoalsComplete())
-        {
-            GameEventManager.TriggerEvent(GameEventType.GAME_WON);
-        }
     }
 
     private void handleRestart(object param)
@@ -38,24 +33,47 @@ public class Goals : MonoBehaviour
         }
     }
 
-    public bool GoalCheck(BoardObject bo)
+    public void GoalCheck(BoardObject bo)
     {
+        bool isGoal = false;
         foreach(Goal goal in GoalList)
         {
             if(goal != null && !goal.Complete)
             {
                 if(goal.Color == bo.Color && goal.Type == bo.Type)
                 {
-                    goal.Collect();
-                    if(goal.Amount == 0)
+                    isGoal = true;
+                    bo.SetActive(true);
+                    bo.MySpriteRenderer.sortingOrder = 10;
+                    bo.IsCollecting = true;
+                    bo.transform.SetParent(null);
+
+                    Vector3 goalPos = goal.transform.position;
+                    LeanTween.scale(bo.gameObject, Vector3.one * 0.6f, 0.8f);
+                    LeanTween.move(bo.gameObject, goalPos, 0.8f).setOnComplete(() =>
                     {
-                        goal.Complete = true;
-                    }
-                    return true;
+                        Destroy(bo.gameObject);
+                        if(goal.Amount > 0)
+                        {
+                            goal.Collect();
+                        }
+                        else
+                        {
+                            goal.Complete = true;
+                            if(GoalsComplete())
+                            {
+                                GameEventManager.TriggerEvent(GameEventType.GAME_WON);
+                            }
+                        }
+                    });
                 }
             }
         }
-        return false;
+
+        if(!isGoal)
+        {
+            //bo.gameObject.SetActive(false);
+        }
     }
 
     public bool GoalsComplete()

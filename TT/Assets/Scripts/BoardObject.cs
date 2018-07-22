@@ -71,6 +71,8 @@ public class BoardObject : MonoBehaviour
 
     [HideInInspector] public int SwapCount = 0;
 
+    [HideInInspector] public bool IsCollecting = false;
+
     [Header("Sprite Settings")]
     public SpriteRenderer MySpriteRenderer;   
     public Sprite NONE;
@@ -119,20 +121,24 @@ public class BoardObject : MonoBehaviour
 
     public virtual void Break(float animDelay)
     {
-        SetActive(false);
-        State = BoardObjectState.BREAKING;
-
-        LeanTween.delayedCall(gameObject, animDelay, () =>
+        if(_active)
         {
-            gameObject.SetActive(false);
-            GameEventManager.TriggerEvent(GameEventType.BREAK_BLOCK, this);
+            SetActive(false);
+            State = BoardObjectState.BREAKING;
 
-            LeanTween.delayedCall(gameObject, 0.15f, () =>
+            LeanTween.delayedCall(gameObject, animDelay, () =>
             {
-                MyTile.RemoveBoardObject(TileLayer);
-                Destroy(gameObject);
-            });
-        });            
+                GameEventManager.TriggerEvent(GameEventType.BREAK_BLOCK, this);
+                LeanTween.delayedCall(gameObject, 0.15f, () =>
+                {
+                    MyTile.RemoveBoardObject(TileLayer);
+                    if(!IsCollecting)
+                    {
+                        Destroy(gameObject);
+                    }
+                });
+            });  
+        }
     }
 
     private void breakParticles()
@@ -208,6 +214,11 @@ public class BoardObject : MonoBehaviour
 
     void Update()
     {
+        if(State == BoardObjectState.BREAKING)
+        {
+            return;
+        }
+
         if(MyTile != null)
         {
             if(transform.position.y > MyTile.transform.position.y)

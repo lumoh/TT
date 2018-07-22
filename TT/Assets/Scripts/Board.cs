@@ -556,7 +556,7 @@ public class Board : MonoBehaviour
     private void handleRestart(object param)
     {
         GameObject BoardPrefab = Resources.Load<GameObject>("Board");
-        GameObject newBoard = Instantiate(BoardPrefab);
+        Instantiate(BoardPrefab);
         Destroy(gameObject);
     }
 }
