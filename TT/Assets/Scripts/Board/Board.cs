@@ -181,7 +181,7 @@ public class Board : MonoBehaviour
                     {
                         if(Random.Range(0, 10) == 0)
                         {
-                            AddStationaryBlock(tile);
+                            AddRockBlock(tile);
                         }
                         else
                         {
@@ -410,9 +410,9 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void AddStationaryBlock(Tile tile)
+    public void AddRockBlock(Tile tile)
     {
-        string type = "StationaryBlock";
+        string type = "RockBlock";
         GameObject Prefab = Resources.Load<GameObject>(type);
         GameObject obj = Instantiate(Prefab);
         if (obj != null)

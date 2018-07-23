@@ -170,16 +170,19 @@ public class BoardObject : MonoBehaviour
 
     public void SetActive(bool active)
     {
-        Color c = MySpriteRenderer.color;
-        if(!active)
+        if(MySpriteRenderer != null)
         {
-            c.a = 0.25f;
+            Color c = MySpriteRenderer.color;
+            if(!active)
+            {
+                c.a = 0.25f;
+            }
+            else
+            {
+                c.a = 1f;
+            }
+            MySpriteRenderer.color = c;
         }
-        else
-        {
-            c.a = 1f;
-        }
-        MySpriteRenderer.color = c;
         _active = active;
     }
 
@@ -311,7 +314,7 @@ public class BoardObject : MonoBehaviour
         return tileBelow;
     }
 
-    void OnDestroy()
+    public virtual void OnDestroy()
     {
         LeanTween.cancel(gameObject);
         GameEventManager.UnRegisterForEvent(GameEventType.GAME_LOST, handleLoss);
