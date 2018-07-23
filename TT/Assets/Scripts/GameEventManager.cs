@@ -9,7 +9,8 @@ public enum GameEventType
     GAME_WON,
     GAME_LOST,
     BREAK_BLOCK,
-    RESTART
+    RESTART,
+    MOVE
 };
 
 /// <summary>

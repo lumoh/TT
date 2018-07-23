@@ -371,24 +371,29 @@ public class Board : MonoBehaviour
                 }
             }
 
-            if(swapB1 && swapB2)
+            if(swapB1 || swapB2)
             {
-                t1.AddBoardObject(b2, false);
-                t2.AddBoardObject(b1, false);
-                b1.Swap(t2);
-                b2.Swap(t1);
-            }
-            else if(swapB1 && !swapB2)
-            {
-                t1.RemoveBoardObject(b1.TileLayer);
-                t2.AddBoardObject(b1, false);
-                b1.Swap(t2);
-            }
-            else if(swapB2 && !swapB1)
-            {
-                t2.RemoveBoardObject(b2.TileLayer);
-                t1.AddBoardObject(b2, false);
-                b2.Swap(t1);
+                if(swapB1 && swapB2)
+                {
+                    t1.AddBoardObject(b2, false);
+                    t2.AddBoardObject(b1, false);
+                    b1.Swap(t2);
+                    b2.Swap(t1);
+                }
+                else if(swapB1 && !swapB2)
+                {
+                    t1.RemoveBoardObject(b1.TileLayer);
+                    t2.AddBoardObject(b1, false);
+                    b1.Swap(t2);
+                }
+                else if(swapB2 && !swapB1)
+                {
+                    t2.RemoveBoardObject(b2.TileLayer);
+                    t1.AddBoardObject(b2, false);
+                    b2.Swap(t1);
+                }
+
+                GameEventManager.TriggerEvent(GameEventType.MOVE);
             }
 
             LeanTween.delayedCall(0.12f, () =>
