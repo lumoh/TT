@@ -9,7 +9,7 @@ public class Spawner : BoardObject
 {
     private string _spawnType;
 
-	public void Start() 
+	public override void Start() 
     {
         State = BoardObjectState.NONE;
 	}

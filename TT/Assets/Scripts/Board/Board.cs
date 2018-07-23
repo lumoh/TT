@@ -179,7 +179,14 @@ public class Board : MonoBehaviour
                     Tile tile = GetTile(x, y);
                     if(tile != null)
                     {
-                        AddRandomBlock("Block", tile);
+                        if(Random.Range(0, 10) == 0)
+                        {
+                            AddStationaryBlock(tile);
+                        }
+                        else
+                        {
+                            AddRandomBlock("Block", tile);
+                        }
 
                         while(MatchExists())
                         {
@@ -400,6 +407,24 @@ public class Board : MonoBehaviour
             {
                 _swapOnCooldown = false;
             });
+        }
+    }
+
+    public void AddStationaryBlock(Tile tile)
+    {
+        string type = "StationaryBlock";
+        GameObject Prefab = Resources.Load<GameObject>(type);
+        GameObject obj = Instantiate(Prefab);
+        if (obj != null)
+        {
+            BoardObject boardObject = obj.GetComponent<BoardObject>();
+            boardObject.Init(BoardObjectColor.NONE, boardObject.TileLayer);
+            AddBoardObject(boardObject, tile.X, tile.Y);
+
+            if(!InPlay(tile.X, tile.Y)) 
+            {
+                boardObject.SetActive(false);
+            }
         }
     }
 

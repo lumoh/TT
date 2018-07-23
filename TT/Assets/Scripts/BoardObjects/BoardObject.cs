@@ -13,23 +13,13 @@ public class BoardObject : MonoBehaviour
     public BoardObjectState State = BoardObjectState.SETTLED;
     public bool Swappable = true;
     public bool Matchable = true;
+    public bool Fallable = true;
     public float SwapSpeed = 0.2f;
 
     /// <summary>
     /// used to help decide where the combo originated
     /// </summary>
     [HideInInspector] public int LastMove = 0;
-
-    /// <summary>
-    /// keep track of combo count
-    /// </summary>
-    [HideInInspector] public int ComboCount = 0;
-
-    /// <summary>
-    /// was this block influenced by player
-    /// important when deciding if match is combo
-    /// </summary>
-    [HideInInspector] public bool Influenced = false;
 
     [Header("Sprite Settings")]
     public SpriteRenderer MySpriteRenderer;   
@@ -48,7 +38,7 @@ public class BoardObject : MonoBehaviour
     private Vector3 _velocity;
 
 	// Use this for initialization
-	public void Start() 
+	public virtual void Start() 
     {
         State = BoardObjectState.SETTLED;
         GameEventManager.RegisterForEvent(GameEventType.GAME_LOST, handleLoss);
@@ -155,20 +145,6 @@ public class BoardObject : MonoBehaviour
                     }
                 });
             });
-
-            markCombo();
-        }
-    }
-
-    private void markCombo()
-    {
-        for(int y = Y; y >= MyBoard.MinY; y--)
-        {
-            BoardObject bo = MyBoard.GetBoardObject(X, y);
-            if(bo != null)
-            {
-                bo.ComboCount = ComboCount + 1;
-            }
         }
     }
 
@@ -245,7 +221,7 @@ public class BoardObject : MonoBehaviour
             return;
         }
 
-        if(MyTile != null)
+        if(MyTile != null && Fallable)
         {
             if(transform.position.y > MyTile.transform.position.y)
             {
