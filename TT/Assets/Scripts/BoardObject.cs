@@ -86,7 +86,7 @@ public class BoardObject : MonoBehaviour
     public SpriteRenderer MySpriteRenderer;   
     public Sprite NONE;
     public Sprite RED;
-    public Sprite ORANGE;
+    public Sprite TEAL;
     public Sprite YELLOW;
     public Sprite GREEN;
     public Sprite BLUE;
@@ -206,9 +206,9 @@ public class BoardObject : MonoBehaviour
             {
                 MySpriteRenderer.sprite = RED;
             }
-            else if(_color == BoardObjectColor.ORANGE)
+            else if(_color == BoardObjectColor.TEAL)
             {
-                MySpriteRenderer.sprite = ORANGE;
+                MySpriteRenderer.sprite = TEAL;
             }
             else if(_color == BoardObjectColor.YELLOW)
             {

@@ -35,14 +35,12 @@ public class Goals : MonoBehaviour
 
     public void GoalCheck(BoardObject bo)
     {
-        bool isGoal = false;
         foreach(Goal goal in GoalList)
         {
             if(goal != null && !goal.Complete)
             {
                 if(goal.Color == bo.Color && goal.Type == bo.Type)
                 {
-                    isGoal = true;
                     bo.SetActive(true);
                     bo.MySpriteRenderer.sortingOrder = 10;
                     bo.IsCollecting = true;

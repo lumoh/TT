@@ -52,7 +52,7 @@ public class Spawner : BoardObject
                 BoardObject boardObject = spawnedObject.GetComponent<BoardObject>();
                 if (boardObject != null)
                 {
-                    boardObject.Init(ColorUtil.PickRandom(), TileLayer);
+                    boardObject.Init(ColorUtil.PickRandom(MyBoard.NumColors), TileLayer);
                     MyBoard.AddBoardObject(boardObject, X, Y, false);
                     boardObject.transform.position = transform.position;
                     boardObject.transform.localScale = Vector3.zero;

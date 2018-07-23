@@ -4,7 +4,7 @@ public enum BoardObjectColor
 {
     NONE = 0,
     RED = 1,
-    ORANGE = 2,
+    TEAL = 2,
     YELLOW = 3,
     GREEN = 4,
     BLUE = 5,
@@ -13,9 +13,10 @@ public enum BoardObjectColor
 
 public class ColorUtil
 {   
-    public static BoardObjectColor PickRandom()
-    {
+    public static BoardObjectColor PickRandom(int num)
+    {        
         BoardObjectColor[] colors = (BoardObjectColor[])System.Enum.GetValues(typeof(BoardObjectColor));
-        return colors[Random.Range(1, colors.Length - 1)];
+        num = Mathf.Clamp(num, 3, colors.Length - 1);
+        return colors[Random.Range(1, num + 1)];
     }
 }

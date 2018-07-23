@@ -28,6 +28,11 @@ public class Board : MonoBehaviour
     public int Width;
 
     /// <summary>
+    /// The number colors.
+    /// </summary>
+    public int NumColors;
+
+    /// <summary>
     /// does the board freeze movement when break occurs
     /// </summary>
     public bool IsBreakDelay;
@@ -405,7 +410,7 @@ public class Board : MonoBehaviour
         if (obj != null)
         {
             BoardObject boardObject = obj.GetComponent<BoardObject>();
-            boardObject.Init(ColorUtil.PickRandom(), boardObject.TileLayer);
+            boardObject.Init(ColorUtil.PickRandom(NumColors), boardObject.TileLayer);
             AddBoardObject(boardObject, tile.X, tile.Y);
 
             if(!InPlay(tile.X, tile.Y)) 
