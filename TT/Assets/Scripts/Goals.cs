@@ -43,7 +43,7 @@ public class Goals : MonoBehaviour
                 {
                     bo.SetActive(true);
                     bo.MySpriteRenderer.sortingOrder = 10;
-                    bo.IsCollecting = true;
+                    bo.State = BoardObjectState.COLLECTING;
                     bo.transform.SetParent(null);
 
                     Vector3 goalPos = goal.transform.position;

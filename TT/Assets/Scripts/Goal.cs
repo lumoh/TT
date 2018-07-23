@@ -15,17 +15,13 @@ public class Goal : MonoBehaviour
     void Awake()
     {
         _amountText = GetComponentInChildren<Text>();
+        setText();
     }
 
     public void Collect()
     {
         Amount--;
-
-        if(_amountText != null)
-        {
-            _amountText.text = Amount.ToString();
-        }
-
+        setText();
         if(Amount == 0)
         {
             Complete = true;
@@ -36,6 +32,11 @@ public class Goal : MonoBehaviour
     {
         Complete = false;
         Amount = 10;
+        setText();
+    }
+
+    private void setText()
+    {
         if(_amountText != null)
         {
             _amountText.text = Amount.ToString();

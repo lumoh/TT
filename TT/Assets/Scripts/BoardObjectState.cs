@@ -6,7 +6,8 @@ public enum BoardObjectState
     SETTLED = 1,
     SWAPPING = 2,
     FALLING = 3,
-    BREAKING = 4
+    BREAKING = 4,
+    COLLECTING = 5
 }
 
 public enum FallDir

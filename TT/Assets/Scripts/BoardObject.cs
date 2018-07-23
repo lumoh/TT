@@ -6,9 +6,73 @@ using UnityEngine;
 /// object that resides on a tile on the board
 /// </summary>
 public class BoardObject : MonoBehaviour 
-{
-    [HideInInspector] public Tile MyTile;
-    public Board MyBoard { get { return MyTile.Board; } }
+{    
+    [Header("Board Settings")]
+    public Tile MyTile;
+    public int TileLayer;
+    public BoardObjectState State = BoardObjectState.SETTLED;
+    public bool Swappable = true;
+    public bool Matchable = true;
+    public float SwapSpeed = 0.2f;
+
+    /// <summary>
+    /// used to help decide where the combo originated
+    /// </summary>
+    [HideInInspector] public int LastMove = 0;
+
+    /// <summary>
+    /// keep track of combo count
+    /// </summary>
+    [HideInInspector] public int ComboCount = 0;
+
+    /// <summary>
+    /// was this block influenced by player
+    /// important when deciding if match is combo
+    /// </summary>
+    [HideInInspector] public bool Influenced = false;
+
+    [Header("Sprite Settings")]
+    public SpriteRenderer MySpriteRenderer;   
+    public Sprite NONE;
+    public Sprite RED;
+    public Sprite TEAL;
+    public Sprite YELLOW;
+    public Sprite GREEN;
+    public Sprite BLUE;
+    public Sprite PURPLE;
+
+    [SerializeField] private BoardObjectColor _color = BoardObjectColor.NONE;
+    [SerializeField] private BoardObjectType _type = BoardObjectType.NONE; 
+
+    private bool _active = true;
+    private Vector3 _velocity;
+
+	// Use this for initialization
+	public void Start() 
+    {
+        State = BoardObjectState.SETTLED;
+        GameEventManager.RegisterForEvent(GameEventType.GAME_LOST, handleLoss);
+        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleWon);
+	}
+
+    public void Init(BoardObjectColor c, int tileLayer)
+    {
+        TileLayer = tileLayer;
+        Color = c;
+    }
+
+    public Board MyBoard 
+    { 
+        get 
+        {
+            Board b = null;
+            if(MyTile != null)
+            {
+                b = MyTile.Board;
+            }
+            return b;
+        } 
+    }
 
     public int X
     {
@@ -36,12 +100,6 @@ public class BoardObject : MonoBehaviour
         }
     }
 
-    [Header("Board Settings")]
-    public int TileLayer;
-
-    public BoardObjectState State = BoardObjectState.SETTLED;
-
-    [SerializeField] private BoardObjectColor _color = BoardObjectColor.NONE;
     public BoardObjectColor Color 
     { 
         get { return _color; } 
@@ -52,58 +110,9 @@ public class BoardObject : MonoBehaviour
         }
     }
 
-    [SerializeField] private BoardObjectType _type = BoardObjectType.NONE;
     public BoardObjectType Type 
     {       
         get { return _type; } 
-        set { /* TODO */ }
-    }
-
-    [SerializeField] public bool Swappable = true;
-    [SerializeField] public bool Matchable = true;
-    private bool _active = true;
-
-    [HideInInspector] public int LastMove = 0;
-
-    public float SwapSpeed = 0.2f;
-
-    private Vector3 _velocity;
-
-    /// <summary>
-    /// keep track of combo count
-    /// </summary>
-    [HideInInspector] public int ComboCount = 0;
-
-    /// <summary>
-    /// was this block influenced by player
-    /// important when deciding if match is combo
-    /// </summary>
-    [HideInInspector] public bool Influenced = false;
-
-    [HideInInspector] public bool IsCollecting = false;
-
-    [Header("Sprite Settings")]
-    public SpriteRenderer MySpriteRenderer;   
-    public Sprite NONE;
-    public Sprite RED;
-    public Sprite TEAL;
-    public Sprite YELLOW;
-    public Sprite GREEN;
-    public Sprite BLUE;
-    public Sprite PURPLE;
-
-	// Use this for initialization
-	public virtual void Start() 
-    {
-        State = BoardObjectState.SETTLED;
-        GameEventManager.RegisterForEvent(GameEventType.GAME_LOST, handleLoss);
-        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleWon);
-	}
-
-    public virtual void Init(BoardObjectColor c, int tileLayer)
-    {
-        TileLayer = tileLayer;
-        Color = c;
     }
 
     public bool CanSwap()
@@ -127,7 +136,7 @@ public class BoardObject : MonoBehaviour
         });
     }
 
-    public virtual void Break(float animDelay)
+    public void Break(float animDelay)
     {
         if(_active)
         {
@@ -140,7 +149,7 @@ public class BoardObject : MonoBehaviour
                 LeanTween.delayedCall(gameObject, 0.15f, () =>
                 {
                     MyTile.RemoveBoardObject(TileLayer);
-                    if(!IsCollecting)
+                    if(State == BoardObjectState.BREAKING)
                     {
                         Destroy(gameObject);
                     }
@@ -198,7 +207,7 @@ public class BoardObject : MonoBehaviour
         _active = active;
     }
 
-    protected virtual void setSpriteForColor()
+    protected void setSpriteForColor()
     {
         if(MySpriteRenderer != null)
         {
@@ -231,7 +240,7 @@ public class BoardObject : MonoBehaviour
 
     void Update()
     {
-        if(State == BoardObjectState.BREAKING)
+        if(State == BoardObjectState.BREAKING || State == BoardObjectState.COLLECTING)
         {
             return;
         }
