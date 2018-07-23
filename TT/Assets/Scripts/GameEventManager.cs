@@ -226,7 +226,7 @@ public static class GameEventManager
                 var wec = entry.Value;
                 if (wec != null && wec.CheckNullTargets())
                 {
-                    //Debug.Log(typeof(WorldEventManager), "WEM: Null target found on " + entry.Key.ToString());
+                    UnityEngine.Debug.Log("WEM: Null target found on " + entry.Key.ToString());
                 }
             }
         }
