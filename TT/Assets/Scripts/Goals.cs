@@ -57,9 +57,9 @@ public class Goals : MonoBehaviour
                         {
                             goal.Collect();
                         }
-                        else
+
+                        if(goal.Complete)
                         {
-                            goal.Complete = true;
                             if(GoalsComplete())
                             {
                                 GameEventManager.TriggerEvent(GameEventType.GAME_WON);
@@ -68,11 +68,6 @@ public class Goals : MonoBehaviour
                     }).setEase(LeanTweenType.easeInBack);
                 }
             }
-        }
-
-        if(!isGoal)
-        {
-            //bo.gameObject.SetActive(false);
         }
     }
 

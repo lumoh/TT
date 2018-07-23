@@ -69,7 +69,16 @@ public class BoardObject : MonoBehaviour
 
     private Vector3 _velocity;
 
-    [HideInInspector] public int SwapCount = 0;
+    /// <summary>
+    /// keep track of combo count
+    /// </summary>
+    [HideInInspector] public int ComboCount = 0;
+
+    /// <summary>
+    /// was this block influenced by player
+    /// important when deciding if match is combo
+    /// </summary>
+    [HideInInspector] public bool Influenced = false;
 
     [HideInInspector] public bool IsCollecting = false;
 
@@ -111,7 +120,6 @@ public class BoardObject : MonoBehaviour
 
     public void Swap(Tile t)
     {
-        SwapCount++;
         State = BoardObjectState.SWAPPING;
         LeanTween.move(gameObject, t.transform.position, 0.1f).setOnComplete(() =>
         {
@@ -137,7 +145,21 @@ public class BoardObject : MonoBehaviour
                         Destroy(gameObject);
                     }
                 });
-            });  
+            });
+
+            markCombo();
+        }
+    }
+
+    private void markCombo()
+    {
+        for(int y = Y; y >= MyBoard.MinY; y--)
+        {
+            BoardObject bo = MyBoard.GetBoardObject(X, y);
+            if(bo != null)
+            {
+                bo.ComboCount = ComboCount + 1;
+            }
         }
     }
 
@@ -248,8 +270,6 @@ public class BoardObject : MonoBehaviour
                         {
                             MyBoard.BreakMatches();
                         }
-
-                        resetSwapCount();
                     }
                     // if not blocked then move to it
                     else if(targetTile != null)
@@ -264,14 +284,6 @@ public class BoardObject : MonoBehaviour
                     advanceFallingObject();
                 }
             }
-        }
-    }
-
-    private void resetSwapCount()
-    {
-        if(_active)
-        {
-            SwapCount = 0;
         }
     }
 

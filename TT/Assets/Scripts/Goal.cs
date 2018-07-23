@@ -20,9 +20,15 @@ public class Goal : MonoBehaviour
     public void Collect()
     {
         Amount--;
+
         if(_amountText != null)
         {
             _amountText.text = Amount.ToString();
+        }
+
+        if(Amount == 0)
+        {
+            Complete = true;
         }
     }
 
