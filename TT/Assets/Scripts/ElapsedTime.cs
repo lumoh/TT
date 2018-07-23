@@ -8,9 +8,9 @@ public class ElapsedTime : MonoBehaviour
     private Text _text;
     private float _startTime;
 
-	// Use this for initialization
 	void Awake() 
     {
+        GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
         _text = GetComponent<Text>();
         _startTime = Time.time;
         setText();
@@ -32,5 +32,16 @@ public class ElapsedTime : MonoBehaviour
             string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds);
             _text.text = formattedTime;
         }
+    }
+
+    private void handleRestart(object param)
+    {
+        _startTime = Time.time;
+        setText();
+    }
+
+    void OnDestroy()
+    {
+        GameEventManager.UnRegisterForEvent(GameEventType.RESTART, handleRestart);
     }
 }
