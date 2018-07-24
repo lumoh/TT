@@ -49,6 +49,7 @@ public class BoardObject : MonoBehaviour
     {
         TileLayer = tileLayer;
         Color = c;
+        name = Color.ToString();
     }
 
     public Board MyBoard 
@@ -120,7 +121,7 @@ public class BoardObject : MonoBehaviour
     public void Swap(Tile t)
     {
         State = BoardObjectState.SWAPPING;
-        LeanTween.move(gameObject, t.transform.position, 0.1f).setOnComplete(() =>
+        LeanTween.move(gameObject, t.transform.position, SwapSpeed).setOnComplete(() =>
         {
             State = BoardObjectState.FALLING;
         });

@@ -179,7 +179,8 @@ public class Board : MonoBehaviour
                     Tile tile = GetTile(x, y);
                     if(tile != null)
                     {
-                        if(Random.Range(0, 10) == 0)
+                        // don't do rocks
+                        if(Random.Range(0, 10) == 20)
                         {
                             AddRockBlock(tile);
                         }

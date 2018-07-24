@@ -636,34 +636,34 @@ public class MatchFinder
     {
         BoardObjectType result = BoardObjectType.FALLING_MATCH;
 
-//        if(combo.type == MatchCombo.MatchTypes.MATCH_4_SQUARE)
-//        {
-//            result = BoardObjectType.ROCKET;
-//        }
-//        else if(combo.type == MatchCombo.MatchTypes.MATCH_4_COLUMN)
-//        {
-//            result = BoardObjectType.ROW_BREAKER;
-//        }
-//        else if(combo.type == MatchCombo.MatchTypes.MATCH_4_ROW)
-//        {
-//            result = BoardObjectType.COLUMN_BREAKER;
-//        }
-//        else if(combo.type == MatchCombo.MatchTypes.MATCH_L)
-//        {
-//            result = BoardObjectType.BOMB_BREAKER;
-//        }
-//        else if(combo.type == MatchCombo.MatchTypes.MATCH_T)
-//        {
-//            result = BoardObjectType.X_BREAKER;
-//        }
-//        else if(combo.type == MatchCombo.MatchTypes.MATCH_5)
-//        {
-//            result = BoardObjectType.RAINBOW;
-//        }
-//        else if(combo.type == MatchCombo.MatchTypes.MATCH_6_7)
-//        {
-//            result = BoardObjectType.RAINBOW;
-//        }
+        if(combo.type == MatchCombo.MatchTypes.MATCH_4_SQUARE)
+        {
+            result = BoardObjectType.PROJECTILE;
+        }
+        else if(combo.type == MatchCombo.MatchTypes.MATCH_4_COLUMN)
+        {
+            result = BoardObjectType.ROW;
+        }
+        else if(combo.type == MatchCombo.MatchTypes.MATCH_4_ROW)
+        {
+            result = BoardObjectType.COLUMN;
+        }
+        else if(combo.type == MatchCombo.MatchTypes.MATCH_L)
+        {
+            result = BoardObjectType.BOMB;
+        }
+        else if(combo.type == MatchCombo.MatchTypes.MATCH_T)
+        {
+            result = BoardObjectType.X;
+        }
+        else if(combo.type == MatchCombo.MatchTypes.MATCH_5)
+        {
+            result = BoardObjectType.RAINBOW;
+        }
+        else if(combo.type == MatchCombo.MatchTypes.MATCH_6_7)
+        {
+            result = BoardObjectType.RAINBOW;
+        }
         return result;
     }
     
