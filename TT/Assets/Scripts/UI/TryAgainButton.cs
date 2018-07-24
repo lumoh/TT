@@ -15,9 +15,9 @@ public class TryAgainButton : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    public void Pressed()
+    public void Pressed(bool active)
     {
-        gameObject.SetActive(false);
+        gameObject.SetActive(active);
         GameEventManager.TriggerEvent(GameEventType.RESTART);
     }
 }

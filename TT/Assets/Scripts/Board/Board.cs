@@ -104,6 +104,8 @@ public class Board : MonoBehaviour
     {
         GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
         GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
+        GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_UP, handleSpeedUpUp);
+        GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_DOWN, handleSpeedUpDown);
 
         Application.targetFrameRate = 60;
         LeanTween.init(1000);
@@ -597,10 +599,22 @@ public class Board : MonoBehaviour
         Destroy(gameObject);
     }
 
+    private void handleSpeedUpDown(object param)
+    {
+        _speedingUp = true;
+    }
+
+    private void handleSpeedUpUp(object param)
+    {
+        _speedingUp = false;
+    }
+
     void OnDestroy()
     {
         LeanTween.cancel(gameObject);
         GameEventManager.UnRegisterForEvent(GameEventType.GAME_WON, handleGameWon);
         GameEventManager.UnRegisterForEvent(GameEventType.RESTART, handleRestart);
+        GameEventManager.UnRegisterForEvent(GameEventType.SPEEDUP_UP, handleSpeedUpUp);
+        GameEventManager.UnRegisterForEvent(GameEventType.SPEEDUP_DOWN, handleSpeedUpDown);
     }
 }

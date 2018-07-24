@@ -10,7 +10,9 @@ public enum GameEventType
     GAME_LOST,
     BREAK_BLOCK,
     RESTART,
-    MOVE
+    MOVE,
+    SPEEDUP_DOWN,
+    SPEEDUP_UP
 };
 
 /// <summary>
