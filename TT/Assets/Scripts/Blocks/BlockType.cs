@@ -1,6 +1,6 @@
 ﻿using System;
 
-public enum BoardObjectType
+public enum BlockType
 {
     NONE = 0,
     FALLING_MATCH = 1,

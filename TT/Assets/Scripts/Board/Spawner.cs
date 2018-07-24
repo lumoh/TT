@@ -5,13 +5,13 @@ using UnityEngine;
 /// <summary>
 /// Spawner.
 /// </summary>
-public class Spawner : BoardObject 
+public class Spawner : Block 
 {
     private string _spawnType;
 
 	public override void Start() 
     {
-        State = BoardObjectState.NONE;
+        State = BlockState.NONE;
 	}
 
     public void Init(Tile tile, string spawnType, int layer)
@@ -49,7 +49,7 @@ public class Spawner : BoardObject
             GameObject spawnedObject = Instantiate(BoardObjectPrefab);
             if (spawnedObject != null)
             {
-                BoardObject boardObject = spawnedObject.GetComponent<BoardObject>();
+                Block boardObject = spawnedObject.GetComponent<Block>();
                 if (boardObject != null)
                 {
                     boardObject.Init(ColorUtil.PickRandom(MyBoard.NumColors), TileLayer);

@@ -13,12 +13,12 @@ public class MatchFinder
     /// <summary>
     /// Queue helper for finding connected objects
     /// </summary>
-    private Queue<BoardObject> coQueue = new Queue<BoardObject>();
+    private Queue<Block> coQueue = new Queue<Block>();
 
     /// <summary>
     /// Connected objects. Note each call will overwrite the previous list.
     /// </summary>
-    private List<BoardObject> coObjects = new List<BoardObject>();
+    private List<Block> coObjects = new List<Block>();
 
     /// <summary>
     /// The matches.
@@ -49,15 +49,15 @@ public class MatchFinder
         {
             for(int x = 0; x < board.Width; x++)
             {
-                BoardObject blockModel = board.GetBoardObject(x, y);
+                Block blockModel = board.GetBoardObject(x, y);
                 
                 if(blockModel != null && matched[blockModel] == null)
                 {
-                    List<BoardObject> connectedObjects = GetConnectedObjects(board, blockModel);
+                    List<Block> connectedObjects = GetConnectedObjects(board, blockModel);
                     
                     for(int i = 0; i < connectedObjects.Count; i++)
                     {
-                        BoardObject connectedObject = connectedObjects[i];
+                        Block connectedObject = connectedObjects[i];
                         matched[connectedObject] = 1;
                     }
                     
@@ -79,7 +79,7 @@ public class MatchFinder
     /// </summary>
     /// <returns>The connected objects.</returns>
     /// <param name="blockObject">Block object.</param>
-    public List<BoardObject> GetConnectedObjects(Board board, BoardObject blockObject)
+    public List<Block> GetConnectedObjects(Board board, Block blockObject)
     {
         coObjects.Clear();
         coQueue.Clear();
@@ -87,16 +87,16 @@ public class MatchFinder
         
         if (blockObject.CanMatch()) 
         {
-            BoardObject left;
-            BoardObject right;
-            BoardObject up;
-            BoardObject down;
+            Block left;
+            Block right;
+            Block up;
+            Block down;
             int x;
             int y;
             coQueue.Enqueue(blockObject);
             while(coQueue.Count > 0)
             {
-                BoardObject obj = coQueue.Dequeue();
+                Block obj = coQueue.Dequeue();
                 
                 x = obj.X;
                 y = obj.Y;
@@ -142,13 +142,13 @@ public class MatchFinder
     /// <param name="existingColor">existingColor</param>
     /// <param name="newBlock">the block to add</param>
     /// <returns>bool</returns>
-    private static bool IsBlockNewColorMatch(bool[,] visitedBlocks, BoardObjectColor existingColor, BoardObject newBlock)
+    private static bool IsBlockNewColorMatch(bool[,] visitedBlocks, BlockColor existingColor, Block newBlock)
     {
         return newBlock != null 
             && visitedBlocks[newBlock.X, newBlock.Y] == false 
             && newBlock.CanMatch() 
             && newBlock.Color == existingColor
-            && newBlock.Color != BoardObjectColor.NONE;
+            && newBlock.Color != BlockColor.NONE;
     }
     
     /// <summary>
@@ -156,12 +156,12 @@ public class MatchFinder
     /// </summary>
     /// <returns>The match.</returns>
     /// <param name="connectedObjets">Connected objets.</param>
-    public MatchCombo GetMatch(Board board, List<BoardObject> connectedObjects)
+    public MatchCombo GetMatch(Board board, List<Block> connectedObjects)
     {
         MatchCombo allMatchCombo = null;
         MatchCombo matchCombo = null;
         
-        BoardObject blockObj;
+        Block blockObj;
         for(int i = 0; i  < connectedObjects.Count; i++)
         {
             blockObj = connectedObjects[i];
@@ -183,12 +183,12 @@ public class MatchFinder
     /// <returns>The single match.</returns>
     /// <param name="board">Board Context. </param> 
     /// <param name="blockObj">Block object.</param>
-    public MatchCombo FindSingleMatch(Board board, BoardObject blockObj)
+    public MatchCombo FindSingleMatch(Board board, Block blockObj)
     {
         bool MATCH_4 = false;
 
-        List<BoardObject> hMatches = GetHorizontalMatch (board, blockObj);
-        List<BoardObject> vMatches = GetVerticalMatch (board, blockObj);
+        List<Block> hMatches = GetHorizontalMatch (board, blockObj);
+        List<Block> vMatches = GetVerticalMatch (board, blockObj);
         
         int maxPieces = 0;
         
@@ -243,12 +243,12 @@ public class MatchFinder
             } 
             else if (hMatches != null && hMatches.Count == 4) 
             {
-                vMatches = new List<BoardObject> ();
+                vMatches = new List<Block> ();
                 match.type = MatchCombo.MatchTypes.MATCH_4_ROW;
             } 
             else if (vMatches != null && vMatches.Count == 4) 
             {
-                hMatches = new List<BoardObject> ();
+                hMatches = new List<Block> ();
                 match.type = MatchCombo.MatchTypes.MATCH_4_COLUMN;
             } 
             else if (hMatches != null && hMatches.Count == 3) 
@@ -262,8 +262,8 @@ public class MatchFinder
                 int savedY = -1;
                 for (int i = 0; i < hMatches.Count; i++)
                 {
-                    BoardObject bm = hMatches[i];
-                    List<BoardObject> moreVMatches = GetVerticalMatch(board, bm);
+                    Block bm = hMatches[i];
+                    List<Block> moreVMatches = GetVerticalMatch(board, bm);
                     if (moreVMatches == null || moreVMatches.Count < 2)
                     {
                         found2X3Match = false;
@@ -295,7 +295,7 @@ public class MatchFinder
                 }
                 else
                 {
-                    vMatches = new List<BoardObject> ();
+                    vMatches = new List<Block> ();
                     match.type = MatchCombo.MatchTypes.MATCH_3;
                 }                   
             } 
@@ -309,8 +309,8 @@ public class MatchFinder
                 int savedX = -1;
                 for (int i = 0; i < vMatches.Count; i++)
                 {
-                    BoardObject bm = vMatches[i];
-                    List<BoardObject> moreHMatches = GetHorizontalMatch (board, bm);
+                    Block bm = vMatches[i];
+                    List<Block> moreHMatches = GetHorizontalMatch (board, bm);
                     if (moreHMatches == null || moreHMatches.Count < 2)
                     {
                         found2X3Match = false;
@@ -342,7 +342,7 @@ public class MatchFinder
                 }
                 else
                 {
-                    hMatches = new List<BoardObject>();
+                    hMatches = new List<Block>();
                     match.type = MatchCombo.MatchTypes.MATCH_3;
                 }
             }
@@ -370,13 +370,13 @@ public class MatchFinder
                         maxY = Mathf.Max (hMatches [i].Y, Mathf.Max (vMatches [i].Y, maxY));
                     }
 
-                    BoardObject topLeft = board.GetBoardObject (minX, maxY);
-                    BoardObject topRight = board.GetBoardObject (maxX, maxY);
-                    BoardObject bottomLeft = board.GetBoardObject (minX, minY);
-                    BoardObject bottomRight = board.GetBoardObject (maxX, minY);
+                    Block topLeft = board.GetBoardObject (minX, maxY);
+                    Block topRight = board.GetBoardObject (maxX, maxY);
+                    Block bottomLeft = board.GetBoardObject (minX, minY);
+                    Block bottomRight = board.GetBoardObject (maxX, minY);
 
                     if ((topLeft == null || topRight == null || bottomLeft == null || bottomRight == null) ||
-                        (topLeft.Type == BoardObjectType.RAINBOW || topRight.Type == BoardObjectType.RAINBOW || bottomLeft.Type == BoardObjectType.RAINBOW || bottomRight.Type == BoardObjectType.RAINBOW) ||
+                        (topLeft.Type == BlockType.RAINBOW || topRight.Type == BlockType.RAINBOW || bottomLeft.Type == BlockType.RAINBOW || bottomRight.Type == BlockType.RAINBOW) ||
                         (!topLeft.CanMatch()) || (!topRight.CanMatch()) || (!bottomLeft.CanMatch()) || (!bottomRight.CanMatch())) 
                     {
                         return null;
@@ -479,12 +479,12 @@ public class MatchFinder
     /// </summary>
     /// <returns>The match piece.</returns>
     /// <param name="matches">Matches.</param>
-    private BoardObject FindMatchPiece(List<BoardObject> matches)
+    private Block FindMatchPiece(List<Block> matches)
     {
-        BoardObject blockObj = null;
+        Block blockObj = null;
         int lastMove = 0;
         
-        BoardObject match;
+        Block match;
         for(int i = 0; i < matches.Count; i++)
         {
             if(matches[i] != null)
@@ -506,7 +506,7 @@ public class MatchFinder
     /// </summary>
     /// <returns>The horizontal match.</returns>
     /// <param name="blockObj">Block object.</param>
-    private List<BoardObject> GetHorizontalMatch(Board board, BoardObject blockObj)
+    private List<Block> GetHorizontalMatch(Board board, Block blockObj)
     {
         int MATCH_COUNT = 3;
         if(true)
@@ -515,13 +515,13 @@ public class MatchFinder
         }
         
         int i; int j; int k;
-        BoardObject sp;
+        Block sp;
         
         i = blockObj.X - 1;
         for(;;)
         {
             sp = board.GetBoardObject(i, blockObj.Y);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
             i--;
         }
         
@@ -529,13 +529,13 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(j, blockObj.Y);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
             j++;
         }
         
         if(j - i > MATCH_COUNT)
         {
-            List<BoardObject> res = new List<BoardObject>();
+            List<Block> res = new List<Block>();
             for(k = i + 1; k < j; k++)
             {
                 sp = board.GetBoardObject(k, blockObj.Y);
@@ -554,7 +554,7 @@ public class MatchFinder
     /// </summary>
     /// <returns>The vertical match.</returns>
     /// <param name="blockObj">Block object.</param>
-    private List<BoardObject> GetVerticalMatch(Board board, BoardObject blockObj)
+    private List<Block> GetVerticalMatch(Board board, Block blockObj)
     {
         int MATCH_COUNT = 3;
         if (true)
@@ -563,13 +563,13 @@ public class MatchFinder
         }
         
         int i; int j; int k;
-        BoardObject sp;
+        Block sp;
         
         i = blockObj.Y - 1;
         for(;;)
         {
             sp = board.GetBoardObject(blockObj.X, i);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
             i--;
         }
         
@@ -577,13 +577,13 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(blockObj.X, j);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BoardObjectColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
             j++;
         }
         
         if(j - i > MATCH_COUNT)
         {
-            List<BoardObject> res = new List<BoardObject>();
+            List<Block> res = new List<Block>();
             for(k = i + 1; k < j; k++)
             {
                 sp = board.GetBoardObject(blockObj.X, k);
@@ -602,9 +602,9 @@ public class MatchFinder
     /// </summary>
     /// <returns>The from combo.</returns>
     /// <param name="combo">Combo.</param>
-    public BoardObject BlockFromCombo(MatchCombo combo)
+    public Block BlockFromCombo(MatchCombo combo)
     {
-        BoardObject spawnedBlock = null;
+        Block spawnedBlock = null;
 
 // TODO
 //        spawnedBlock = new BoardObject();
@@ -632,37 +632,37 @@ public class MatchFinder
     /// </summary>
     /// <returns>The type from combo.</returns>
     /// <param name="combo">Combo.</param>
-    public BoardObjectType BlockTypeFromCombo(MatchCombo combo)
+    public BlockType BlockTypeFromCombo(MatchCombo combo)
     {
-        BoardObjectType result = BoardObjectType.FALLING_MATCH;
+        BlockType result = BlockType.FALLING_MATCH;
 
         if(combo.type == MatchCombo.MatchTypes.MATCH_4_SQUARE)
         {
-            result = BoardObjectType.PROJECTILE;
+            result = BlockType.PROJECTILE;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_4_COLUMN)
         {
-            result = BoardObjectType.ROW;
+            result = BlockType.ROW;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_4_ROW)
         {
-            result = BoardObjectType.COLUMN;
+            result = BlockType.COLUMN;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_L)
         {
-            result = BoardObjectType.BOMB;
+            result = BlockType.BOMB;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_T)
         {
-            result = BoardObjectType.X;
+            result = BlockType.X;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_5)
         {
-            result = BoardObjectType.RAINBOW;
+            result = BlockType.RAINBOW;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_6_7)
         {
-            result = BoardObjectType.RAINBOW;
+            result = BlockType.RAINBOW;
         }
         return result;
     }
@@ -676,7 +676,7 @@ public class MatchFinder
     /// <returns><c>true</c> if this instance is special match the specified b1 b2; otherwise, <c>false</c>.</returns>
     /// <param name="b1">B1.</param>
     /// <param name="b2">B2.</param>
-    public bool IsSpecialMatch(BoardObjectType b1, BoardObjectType b2)
+    public bool IsSpecialMatch(BlockType b1, BlockType b2)
     {
         bool result = false;
 // TODO
@@ -700,7 +700,7 @@ public class MatchFinder
     /// <returns><c>true</c> if invalid special swap; otherwise, <c>false</c>.</returns>
     /// <param name="b1">Block 1 type.</param>
     /// <param name="b2">Block 2 type.</param>
-    bool IsValidSpecial(BoardObjectType b1, BoardObjectType b2)
+    bool IsValidSpecial(BlockType b1, BlockType b2)
     {
         bool result = false;
 // TODO
@@ -732,7 +732,7 @@ public class MatchFinder
     /// <param name="block1">Block1.</param>
     /// <param name="block2">Block2.</param>
     /// <param name="type">Type.</param>
-    bool EitherBlockThisType(BoardObjectType block1, BoardObjectType block2, BoardObjectType type)
+    bool EitherBlockThisType(BlockType block1, BlockType block2, BlockType type)
     {
         bool result = block1.Equals(type) || block2.Equals(type);
         return result;
@@ -746,7 +746,7 @@ public class MatchFinder
     /// <param name="block2">Block2.</param>
     /// <param name="type1">Block Type1.</param>
     /// <param name="type2">Block Type2.</param>
-    bool BothBlocksEitherType(BoardObjectType block1, BoardObjectType block2, BoardObjectType type1, BoardObjectType type2)
+    bool BothBlocksEitherType(BlockType block1, BlockType block2, BlockType type1, BlockType type2)
     {
         bool firstCheck = block1.Equals(type1) &&  block2.Equals(type2);
         bool secondCheck = block1.Equals(type2) &&  block2.Equals(type1);

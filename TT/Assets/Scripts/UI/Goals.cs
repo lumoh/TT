@@ -15,7 +15,7 @@ public class Goals : MonoBehaviour
 
     private void handleBreakBlock(object param)
     {
-        BoardObject bo = (BoardObject)param;
+        Block bo = (Block)param;
         if(bo != null)
         {
             GoalCheck(bo);
@@ -33,7 +33,7 @@ public class Goals : MonoBehaviour
         }
     }
 
-    public void GoalCheck(BoardObject bo)
+    public void GoalCheck(Block bo)
     {
         foreach(Goal goal in GoalList)
         {
@@ -43,7 +43,7 @@ public class Goals : MonoBehaviour
                 {
                     bo.SetActive(true);
                     bo.MySpriteRenderer.sortingOrder = 10;
-                    bo.State = BoardObjectState.COLLECTING;
+                    bo.State = BlockState.COLLECTING;
                     bo.transform.SetParent(null);
 
                     Vector3 goalPos = goal.transform.position;

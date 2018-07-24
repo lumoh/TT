@@ -5,16 +5,17 @@ using UnityEngine;
 /// <summary>
 /// object that resides on a tile on the board
 /// </summary>
-public class BoardObject : MonoBehaviour 
+public class Block : MonoBehaviour 
 {    
     [Header("Board Settings")]
     public Tile MyTile;
     public int TileLayer;
-    public BoardObjectState State = BoardObjectState.SETTLED;
+    public BlockState State = BlockState.SETTLED;
     public bool Swappable = true;
     public bool Matchable = true;
     public bool Fallable = true;
     public float SwapSpeed = 0.2f;
+    public float Gravity = -3f;
 
     /// <summary>
     /// used to help decide where the combo originated
@@ -31,8 +32,8 @@ public class BoardObject : MonoBehaviour
     public Sprite BLUE;
     public Sprite PURPLE;
 
-    [SerializeField] private BoardObjectColor _color = BoardObjectColor.NONE;
-    [SerializeField] private BoardObjectType _type = BoardObjectType.NONE; 
+    [SerializeField] private BlockColor _color = BlockColor.NONE;
+    [SerializeField] private BlockType _type = BlockType.NONE; 
 
     private bool _active = true;
     private Vector3 _velocity;
@@ -40,12 +41,12 @@ public class BoardObject : MonoBehaviour
 	// Use this for initialization
 	public virtual void Start() 
     {
-        State = BoardObjectState.SETTLED;
+        State = BlockState.SETTLED;
         GameEventManager.RegisterForEvent(GameEventType.GAME_LOST, handleLoss);
         GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleWon);
 	}
 
-    public void Init(BoardObjectColor c, int tileLayer)
+    public void Init(BlockColor c, int tileLayer)
     {
         TileLayer = tileLayer;
         Color = c;
@@ -91,7 +92,7 @@ public class BoardObject : MonoBehaviour
         }
     }
 
-    public BoardObjectColor Color 
+    public BlockColor Color 
     { 
         get { return _color; } 
         set 
@@ -101,29 +102,29 @@ public class BoardObject : MonoBehaviour
         }
     }
 
-    public BoardObjectType Type 
+    public BlockType Type 
     {       
         get { return _type; } 
     }
 
     public bool CanSwap()
     {
-        bool settled = State == BoardObjectState.SETTLED;
+        bool settled = State == BlockState.SETTLED;
         return Swappable && settled && _active;
     }
 
     public bool CanMatch()
     {
-        bool settled = State == BoardObjectState.SETTLED;
+        bool settled = State == BlockState.SETTLED;
         return Matchable && settled && _active;
     }
 
     public void Swap(Tile t)
     {
-        State = BoardObjectState.SWAPPING;
+        State = BlockState.SWAPPING;
         LeanTween.move(gameObject, t.transform.position, SwapSpeed).setOnComplete(() =>
         {
-            State = BoardObjectState.FALLING;
+            State = BlockState.FALLING;
         });
     }
 
@@ -132,7 +133,7 @@ public class BoardObject : MonoBehaviour
         if(_active)
         {
             SetActive(false);
-            State = BoardObjectState.BREAKING;
+            State = BlockState.BREAKING;
 
             LeanTween.delayedCall(gameObject, animDelay, () =>
             {
@@ -140,7 +141,7 @@ public class BoardObject : MonoBehaviour
                 LeanTween.delayedCall(gameObject, 0.15f, () =>
                 {
                     MyTile.RemoveBoardObject(TileLayer);
-                    if(State == BoardObjectState.BREAKING)
+                    if(State == BlockState.BREAKING)
                     {
                         Destroy(gameObject);
                     }
@@ -191,27 +192,27 @@ public class BoardObject : MonoBehaviour
     {
         if(MySpriteRenderer != null)
         {
-            if(_color == BoardObjectColor.RED)
+            if(_color == BlockColor.RED)
             {
                 MySpriteRenderer.sprite = RED;
             }
-            else if(_color == BoardObjectColor.TEAL)
+            else if(_color == BlockColor.TEAL)
             {
                 MySpriteRenderer.sprite = TEAL;
             }
-            else if(_color == BoardObjectColor.YELLOW)
+            else if(_color == BlockColor.YELLOW)
             {
                 MySpriteRenderer.sprite = YELLOW;
             }
-            else if(_color == BoardObjectColor.GREEN)
+            else if(_color == BlockColor.GREEN)
             {
                 MySpriteRenderer.sprite = GREEN;
             }
-            else if(_color == BoardObjectColor.BLUE)
+            else if(_color == BlockColor.BLUE)
             {
                 MySpriteRenderer.sprite = BLUE;
             }
-            else if(_color == BoardObjectColor.PURPLE)
+            else if(_color == BlockColor.PURPLE)
             {
                 MySpriteRenderer.sprite = PURPLE;
             }
@@ -220,7 +221,7 @@ public class BoardObject : MonoBehaviour
 
     void Update()
     {
-        if(State == BoardObjectState.BREAKING || State == BoardObjectState.COLLECTING)
+        if(State == BlockState.BREAKING || State == BlockState.COLLECTING)
         {
             return;
         }
@@ -229,21 +230,21 @@ public class BoardObject : MonoBehaviour
         {
             if(transform.position.y > MyTile.transform.position.y)
             {
-                State = BoardObjectState.FALLING;
+                State = BlockState.FALLING;
             }
 
             // board object is settled squarely on its tile
-            if(State == BoardObjectState.SETTLED)
+            if(State == BlockState.SETTLED)
             {
                 // if tile below becomes unoccupied, start falling again!
                 Tile tileBelow = getTileAdjacent(0, 1);
                 if(tileBelow != null && !tileBelow.IsOccupied(TileLayer))
                 {
-                    State = BoardObjectState.FALLING;
+                    State = BlockState.FALLING;
                 }
             }
             // the board object is falling vertically down
-            else if(State == BoardObjectState.FALLING)
+            else if(State == BlockState.FALLING)
             {
                 // if the board object has fallen further than the targeted tile
                 if(transform.position.y <= MyTile.transform.position.y)
@@ -253,7 +254,7 @@ public class BoardObject : MonoBehaviour
                     {
                         _velocity = Vector3.zero;
                         transform.position = MyTile.transform.position;
-                        State = BoardObjectState.SETTLED;
+                        State = BlockState.SETTLED;
 
                         if(!isBlockAbove())
                         {
@@ -278,7 +279,7 @@ public class BoardObject : MonoBehaviour
 
     private void advanceFallingObject()
     {
-        _velocity += new Vector3(0, -3f, 0) * Time.deltaTime;
+        _velocity += new Vector3(0, Gravity, 0) * Time.deltaTime;
         Vector3 newPos = transform.position + _velocity;
         if (newPos.y < MyTile.transform.position.y)
         {
@@ -295,8 +296,8 @@ public class BoardObject : MonoBehaviour
             Tile tile = MyBoard.GetTile(X, y);
             if(tile != null)
             {
-                BoardObject bo = tile.GetBoardObect(TileLayer);
-                if(bo != null && bo.State == BoardObjectState.FALLING)
+                Block bo = tile.GetBoardObect(TileLayer);
+                if(bo != null && bo.State == BlockState.FALLING)
                 {
                     flag = true;
                     break;

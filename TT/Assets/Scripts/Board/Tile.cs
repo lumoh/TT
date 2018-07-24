@@ -17,13 +17,13 @@ public class Tile : MonoBehaviour {
     public int Y { get { return _y; } }
 
     private int NUM_LAYERS = 5;
-    private BoardObject[] _boardObjects;
+    private Block[] _boardObjects;
     private Spawner[] _spawners;
 
     public void Init(Board board, int x, int y)
     {
         _board = board;
-        _boardObjects = new BoardObject[NUM_LAYERS];
+        _boardObjects = new Block[NUM_LAYERS];
         _spawners = new Spawner[NUM_LAYERS];
         _x = x;
         _y = y;
@@ -38,7 +38,7 @@ public class Tile : MonoBehaviour {
     /// </summary>
     /// <param name="boardObject">Board object.</param>
     /// <param name="layer">Layer.</param>
-    public void AddBoardObject(BoardObject boardObject, bool centerPos = true)
+    public void AddBoardObject(Block boardObject, bool centerPos = true)
     {
         if (_boardObjects != null && boardObject.TileLayer >= 0 && boardObject.TileLayer < NUM_LAYERS)
         {
@@ -64,9 +64,9 @@ public class Tile : MonoBehaviour {
         }
     }
 
-    public BoardObject GetBoardObect(int layer)
+    public Block GetBoardObect(int layer)
     {
-        BoardObject boardObject = null;
+        Block boardObject = null;
         if (_boardObjects != null && layer >= 0 && layer < NUM_LAYERS)
         {
             boardObject = _boardObjects[layer];
@@ -79,7 +79,7 @@ public class Tile : MonoBehaviour {
         bool flag = false;
         if (_boardObjects != null && layer >= 0 && layer < NUM_LAYERS)
         {
-            BoardObject boardObject = _boardObjects[layer];
+            Block boardObject = _boardObjects[layer];
             if (boardObject != null)
             {
                 flag = true;

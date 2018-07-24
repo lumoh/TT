@@ -1,6 +1,6 @@
 ﻿using System;
 
-public enum BoardObjectState
+public enum BlockState
 {
     NONE = 0,
     SETTLED = 1,

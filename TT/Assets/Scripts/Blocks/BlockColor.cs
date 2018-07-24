@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public enum BoardObjectColor
+public enum BlockColor
 {
     NONE = 0,
     RED = 1,
@@ -13,9 +13,9 @@ public enum BoardObjectColor
 
 public class ColorUtil
 {   
-    public static BoardObjectColor PickRandom(int num)
+    public static BlockColor PickRandom(int num)
     {        
-        BoardObjectColor[] colors = (BoardObjectColor[])System.Enum.GetValues(typeof(BoardObjectColor));
+        BlockColor[] colors = (BlockColor[])System.Enum.GetValues(typeof(BlockColor));
         num = Mathf.Clamp(num, 3, colors.Length - 1);
         return colors[Random.Range(1, num + 1)];
     }

@@ -11,7 +11,7 @@ public class SwapController : MonoBehaviour
     private Camera _camera;
     private Vector3 _origin;
     private bool _down;
-    private BoardObject _blockToSwap = null;
+    private Block _blockToSwap = null;
 
 	// Use this for initialization
     void Start()
@@ -56,7 +56,7 @@ public class SwapController : MonoBehaviour
                 RaycastHit2D hit = hits[i];
                 if (hit && hit.transform.tag == "Block")
                 {
-                    BoardObject bo = hit.transform.GetComponent<BoardObject>();
+                    Block bo = hit.transform.GetComponent<Block>();
                     if (bo != null)
                     {
                         _blockToSwap = bo;

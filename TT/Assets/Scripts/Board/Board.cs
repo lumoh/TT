@@ -191,7 +191,7 @@ public class Board : MonoBehaviour
 
                         while(MatchExists())
                         {
-                            BoardObject bo = tile.GetBoardObect(3);
+                            Block bo = tile.GetBoardObect(3);
                             tile.RemoveBoardObject(3);
                             Destroy(bo.gameObject);
                             AddRandomBlock("Block", tile);
@@ -247,7 +247,7 @@ public class Board : MonoBehaviour
     /// <param name="boardObject">Board object.</param>
     /// <param name="x">The x coordinate.</param>
     /// <param name="y">The y coordinate.</param>
-    public void AddBoardObject(BoardObject boardObject, int x, int y, bool centerPos = true)
+    public void AddBoardObject(Block boardObject, int x, int y, bool centerPos = true)
     {
         Tile t = GetTile(x, y);
         if (t != null)
@@ -263,9 +263,9 @@ public class Board : MonoBehaviour
     /// <param name="x">The x coordinate.</param>
     /// <param name="y">The y coordinate.</param>
     /// <param name="layer">Layer.</param>
-    public BoardObject GetBoardObject(int x, int y, int layer = 3)
+    public Block GetBoardObject(int x, int y, int layer = 3)
     {
-        BoardObject boardObject = null;
+        Block boardObject = null;
         Tile t = GetTile(x, y);
         if (t != null)
         {
@@ -321,10 +321,10 @@ public class Board : MonoBehaviour
         {
             for(int j = 0; j < matchCombos[i].matches.Count; ++j)
             {
-                BoardObject boardObject = matchCombos[i].matches[j];
+                Block boardObject = matchCombos[i].matches[j];
                 if(boardObject != null)
                 {
-                    float delay = 1.2f + ((float)j * 0.15f);
+                    float delay = 1.2f + ((float)j * 0.1f);
                     boardObject.Break(delay);
 
                     if(IsBreakDelay)
@@ -356,8 +356,8 @@ public class Board : MonoBehaviour
     {
         if(t1 != null && t2 != null && !_swapOnCooldown)
         {
-            BoardObject b1 = t1.GetBoardObect(3);
-            BoardObject b2 = t2.GetBoardObect(3);
+            Block b1 = t1.GetBoardObect(3);
+            Block b2 = t2.GetBoardObect(3);
 
             _swapOnCooldown = true;
             bool swapB1 = false;
@@ -418,8 +418,8 @@ public class Board : MonoBehaviour
         GameObject obj = Instantiate(Prefab);
         if (obj != null)
         {
-            BoardObject boardObject = obj.GetComponent<BoardObject>();
-            boardObject.Init(BoardObjectColor.NONE, boardObject.TileLayer);
+            Block boardObject = obj.GetComponent<Block>();
+            boardObject.Init(BlockColor.NONE, boardObject.TileLayer);
             AddBoardObject(boardObject, tile.X, tile.Y);
 
             if(!InPlay(tile.X, tile.Y)) 
@@ -440,7 +440,7 @@ public class Board : MonoBehaviour
         GameObject obj = Instantiate(Prefab);
         if (obj != null)
         {
-            BoardObject boardObject = obj.GetComponent<BoardObject>();
+            Block boardObject = obj.GetComponent<Block>();
             boardObject.Init(ColorUtil.PickRandom(NumColors), boardObject.TileLayer);
             AddBoardObject(boardObject, tile.X, tile.Y);
 
@@ -515,7 +515,7 @@ public class Board : MonoBehaviour
         bool flag = false;
         for(int x = 0; x < Width; x++)
         {
-            BoardObject bo = GetBoardObject(x, MinY);
+            Block bo = GetBoardObject(x, MinY);
             if(bo != null)
             {
                 flag = true;
@@ -547,7 +547,7 @@ public class Board : MonoBehaviour
             Tile tile = GetTile(x, MaxY);
             if(tile != null)
             {
-                BoardObject bo = tile.GetBoardObect(3);
+                Block bo = tile.GetBoardObect(3);
                 if(bo != null)
                 {
                     bo.SetActive(true);

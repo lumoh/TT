@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RockBlock : BoardObject 
+public class RockBlock : Block 
 {
     public override void Start() 
     {
@@ -12,8 +12,8 @@ public class RockBlock : BoardObject
 
     private void handleBreak(object param)
     {
-        BoardObject bo = (BoardObject)param;
-        if(bo != null && bo.Type == BoardObjectType.FALLING_MATCH && isAdjacent(bo.X, bo.Y))
+        Block bo = (Block)param;
+        if(bo != null && bo.Type == BlockType.FALLING_MATCH && isAdjacent(bo.X, bo.Y))
         {
             Break(0f);
         }

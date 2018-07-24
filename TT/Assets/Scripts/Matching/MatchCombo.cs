@@ -47,12 +47,12 @@ public class MatchCombo : System.Object
 	/// <summary>
 	/// The matches.
 	/// </summary>
-	public List<BoardObject> matches;
+	public List<Block> matches;
 
 	/// <summary>
 	/// The match piece.
 	/// </summary>
-	public BoardObject matchPiece;
+	public Block matchPiece;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="MatchCombo"/> class.
