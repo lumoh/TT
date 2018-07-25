@@ -9,12 +9,16 @@ public class ElapsedTime : MonoBehaviour
     private float _startTime;
     private bool _update;
 
+    private int _speedUpCount;
+
 	void Awake() 
     {
-        _update = true;
         GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
         GameEventManager.RegisterForEvent(GameEventType.GAME_LOST, handleEnd);
         GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleEnd);
+
+        _speedUpCount = 0;
+        _update = true;
         _text = GetComponent<Text>();
         _startTime = Time.time;
         setText();
@@ -25,6 +29,13 @@ public class ElapsedTime : MonoBehaviour
         if(_update)
         {
             setText();
+        }
+
+        int elapsedSeconds = Mathf.FloorToInt(Time.time - _startTime);
+        if(elapsedSeconds > _speedUpCount)
+        {
+            _speedUpCount++;
+            GameEventManager.TriggerEvent(GameEventType.NATURAL_SPEEDUP);
         }
     }
 
@@ -43,6 +54,7 @@ public class ElapsedTime : MonoBehaviour
 
     private void handleRestart(object param)
     {
+        _speedUpCount = 0;
         _update = true;
         _startTime = Time.time;
         setText();

@@ -12,7 +12,8 @@ public enum GameEventType
     RESTART,
     MOVE,
     SPEEDUP_DOWN,
-    SPEEDUP_UP
+    SPEEDUP_UP,
+    NATURAL_SPEEDUP
 };
 
 /// <summary>

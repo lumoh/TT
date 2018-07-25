@@ -106,6 +106,7 @@ public class Board : MonoBehaviour
         GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
         GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_UP, handleSpeedUpUp);
         GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_DOWN, handleSpeedUpDown);
+        GameEventManager.RegisterForEvent(GameEventType.NATURAL_SPEEDUP, handleNaturalSpeedUp);
 
         Application.targetFrameRate = 60;
         LeanTween.init(1000);
@@ -546,8 +547,6 @@ public class Board : MonoBehaviour
         MinY++;
         MaxY++;
 
-        _velocity += new Vector3(0, SpeedUpAmount, 0);
-
         for(int x = 0; x < Width; x++)
         {
             Tile tile = GetTile(x, MaxY);
@@ -613,6 +612,11 @@ public class Board : MonoBehaviour
         _speedingUp = false;
     }
 
+    private void handleNaturalSpeedUp(object param)
+    {
+        _velocity += new Vector3(0, SpeedUpAmount, 0);
+    }
+
     void OnDestroy()
     {
         LeanTween.cancel(gameObject);
@@ -620,5 +624,6 @@ public class Board : MonoBehaviour
         GameEventManager.UnRegisterForEvent(GameEventType.RESTART, handleRestart);
         GameEventManager.UnRegisterForEvent(GameEventType.SPEEDUP_UP, handleSpeedUpUp);
         GameEventManager.UnRegisterForEvent(GameEventType.SPEEDUP_DOWN, handleSpeedUpDown);
+        GameEventManager.UnRegisterForEvent(GameEventType.NATURAL_SPEEDUP, handleNaturalSpeedUp);
     }
 }
