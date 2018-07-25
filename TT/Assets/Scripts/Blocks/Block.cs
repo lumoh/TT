@@ -137,25 +137,33 @@ public class Block : MonoBehaviour
 
     public virtual void Break(float animDelay)
     {
-        if(_active)
+        LeanTween.delayedCall(gameObject, animDelay, () =>
         {
-            SetActive(false);
-            State = BlockState.BREAKING;
-
-            LeanTween.delayedCall(gameObject, animDelay, () =>
+            if(_active)
             {
+                SetActive(false);
+                State = BlockState.BREAKING;
+
                 GameEventManager.TriggerEvent(GameEventType.BREAK_BLOCK, this);
                 customBreakEffect();
-                LeanTween.delayedCall(gameObject, 0.15f, () =>
+
+                if(State == BlockState.COLLECTING)
                 {
-                    MyTile.RemoveBoardObject(TileLayer);
-                    if(State == BlockState.BREAKING)
+                    LeanTween.delayedCall(gameObject, 0.15f, () =>
                     {
+                        MyTile.RemoveBoardObject(TileLayer);
+                    });
+                }
+                else if(State == BlockState.BREAKING)
+                {
+                    LeanTween.scale(gameObject, Vector3.zero, 0.15f).setOnComplete(() =>
+                    {
+                        MyTile.RemoveBoardObject(TileLayer);
                         Destroy(gameObject);
-                    }
-                });
-            });
-        }
+                    });
+                }
+            }
+        });
     }
 
     /// <summary>

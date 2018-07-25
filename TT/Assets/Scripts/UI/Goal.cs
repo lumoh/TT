@@ -11,9 +11,11 @@ public class Goal : MonoBehaviour
     public bool Complete = false;
 
     private Text _amountText;
+    private int _ogAMount;
 
     void Awake()
     {
+        _ogAMount = Amount;
         _amountText = GetComponentInChildren<Text>();
         setText();
     }
@@ -31,7 +33,7 @@ public class Goal : MonoBehaviour
     public void Reset()
     {
         Complete = false;
-        Amount = 10;
+        Amount = _ogAMount;
         setText();
     }
 

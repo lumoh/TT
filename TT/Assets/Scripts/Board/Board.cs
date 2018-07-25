@@ -319,7 +319,7 @@ public class Board : MonoBehaviour
                 Block boardObject = combo.matches[j];
                 if(boardObject != null)
                 {
-                    float delay = 1.2f + ((float)j * 0.1f);
+                    float delay = (float)j * 0.1f;
                     boardObject.Break(delay);
                     if(IsBreakDelay)
                     {
