@@ -181,15 +181,7 @@ public class Board : MonoBehaviour
                     Tile tile = GetTile(x, y);
                     if(tile != null)
                     {
-                        // don't do rocks
-                        if(Random.Range(0, 10) == 20)
-                        {
-                            AddRockBlock(tile);
-                        }
-                        else
-                        {
-                            AddRandomBlock("Block", tile);
-                        }
+                        AddRandomBlock("Block", tile);
 
                         while(MatchExists())
                         {
@@ -321,20 +313,27 @@ public class Board : MonoBehaviour
         }
         for (int i = 0; i < matchCombos.Count; ++i) 
         {
-            for(int j = 0; j < matchCombos[i].matches.Count; ++j)
+            MatchCombo combo = matchCombos[i];
+            for(int j = 0; j < combo.matches.Count; ++j)
             {
-                Block boardObject = matchCombos[i].matches[j];
+                Block boardObject = combo.matches[j];
                 if(boardObject != null)
                 {
                     float delay = 1.2f + ((float)j * 0.1f);
                     boardObject.Break(delay);
-
                     if(IsBreakDelay)
                     {
                         _scrollingDelay = delay;
                     }
-                }
+                }                    
             }
+
+//            if(combo.IsCreateType())
+//            {
+//                BlockType spawnType = MatchFinder.BlockTypeFromCombo(combo);
+//                Block spawnBlock = SpawnBlock(spawnType.ToString(), combo.matchPiece.Color);
+//                combo.matchPiece.MyTile.AddBoardObject(spawnBlock);
+//            }
         }
         return true;
     }
@@ -411,25 +410,7 @@ public class Board : MonoBehaviour
                 _swapOnCooldown = false;
             });
         }
-    }
-
-    public void AddRockBlock(Tile tile)
-    {
-        string type = "RockBlock";
-        GameObject Prefab = Resources.Load<GameObject>(type);
-        GameObject obj = Instantiate(Prefab);
-        if (obj != null)
-        {
-            Block boardObject = obj.GetComponent<Block>();
-            boardObject.Init(BlockColor.NONE, boardObject.TileLayer);
-            AddBoardObject(boardObject, tile.X, tile.Y);
-
-            if(!InPlay(tile.X, tile.Y)) 
-            {
-                boardObject.SetActive(false);
-            }
-        }
-    }
+    }        
 
     /// <summary>
     /// Adds the random block.
@@ -451,6 +432,29 @@ public class Board : MonoBehaviour
                 boardObject.SetActive(false);
             }
         }
+    }
+
+    /// <summary>
+    /// Spawns the block.
+    /// </summary>
+    /// <returns>The block.</returns>
+    /// <param name="type">Type.</param>
+    /// <param name="c">C.</param>
+    public Block SpawnBlock(string type, BlockColor c)
+    {
+        Block block = null;
+        GameObject Prefab = Resources.Load<GameObject>(type);
+        if(Prefab != null)
+        {
+            GameObject obj = Instantiate(Prefab);
+            if(obj != null)
+            {
+                Block boardObject = obj.GetComponent<Block>();
+                boardObject.Init(c, boardObject.TileLayer);
+                block = boardObject;
+            }
+        }
+        return block;
     }
 
     /// <summary>

@@ -62,17 +62,6 @@ public class MatchCombo : System.Object
 
 	}
 
-	public override string ToString ()
-	{
-        return "";
-//		StringBuilder sb = new StringBuilder ();
-//		sb.AppendFormat ("MatchCombo [MatchType={0}]", type)
-//			.AppendFormat ("[{0} Block at ({1},{2})]", matchPiece.BlockName (), matchPiece.X, matchPiece.Y)
-//		//.AppendFormat ("[target=({0},{1})]", matchPieceTargetX, matchPieceTargetY)
-//				.AppendFormat ("[number of pieces={0}]", matches.Count);
-//		return sb.ToString();
-	}
-
 	/// <summary>
 	/// True if this match type spawns a new piece (breaker)
 	/// </summary>

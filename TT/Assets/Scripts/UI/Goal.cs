@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class Goal : MonoBehaviour
 {
-    public BlockColor Color = BlockColor.NONE;
-    public BlockType Type = BlockType.NONE;
+    public BlockColor Color = BlockColor.None;
+    public BlockType Type = BlockType.None;
     public int Amount = 0;
     public bool Complete = false;
 

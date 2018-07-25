@@ -2,13 +2,13 @@
 
 public enum BlockColor
 {
-    NONE = 0,
-    RED = 1,
-    TEAL = 2,
-    YELLOW = 3,
-    GREEN = 4,
-    BLUE = 5,
-    PURPLE = 6
+    None = 0,
+    Red = 1,
+    Teal = 2,
+    Yellow = 3,
+    Green = 4,
+    Blue = 5,
+    Purple = 6
 }
 
 public class ColorUtil

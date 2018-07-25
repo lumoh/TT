@@ -148,7 +148,7 @@ public class MatchFinder
             && visitedBlocks[newBlock.X, newBlock.Y] == false 
             && newBlock.CanMatch() 
             && newBlock.Color == existingColor
-            && newBlock.Color != BlockColor.NONE;
+            && newBlock.Color != BlockColor.None;
     }
     
     /// <summary>
@@ -376,7 +376,7 @@ public class MatchFinder
                     Block bottomRight = board.GetBoardObject (maxX, minY);
 
                     if ((topLeft == null || topRight == null || bottomLeft == null || bottomRight == null) ||
-                        (topLeft.Type == BlockType.RAINBOW || topRight.Type == BlockType.RAINBOW || bottomLeft.Type == BlockType.RAINBOW || bottomRight.Type == BlockType.RAINBOW) ||
+                        (topLeft.Type == BlockType.Rainbow || topRight.Type == BlockType.Rainbow || bottomLeft.Type == BlockType.Rainbow || bottomRight.Type == BlockType.Rainbow) ||
                         (!topLeft.CanMatch()) || (!topRight.CanMatch()) || (!bottomLeft.CanMatch()) || (!bottomRight.CanMatch())) 
                     {
                         return null;
@@ -521,7 +521,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(i, blockObj.Y);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.None) break;
             i--;
         }
         
@@ -529,7 +529,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(j, blockObj.Y);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.None) break;
             j++;
         }
         
@@ -569,7 +569,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(blockObj.X, i);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.None) break;
             i--;
         }
         
@@ -577,7 +577,7 @@ public class MatchFinder
         for(;;)
         {
             sp = board.GetBoardObject(blockObj.X, j);
-            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.NONE) break;
+            if(sp == null || !sp.CanMatch() || sp.Color != blockObj.Color || sp.Color == BlockColor.None) break;
             j++;
         }
         
@@ -634,23 +634,23 @@ public class MatchFinder
     /// <param name="combo">Combo.</param>
     public BlockType BlockTypeFromCombo(MatchCombo combo)
     {
-        BlockType result = BlockType.FALLING_MATCH;
+        BlockType result = BlockType.Block;
 
         if(combo.type == MatchCombo.MatchTypes.MATCH_4_SQUARE)
         {
-            result = BlockType.PROJECTILE;
+            result = BlockType.Projectile;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_4_COLUMN)
         {
-            result = BlockType.ROW;
+            result = BlockType.Row;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_4_ROW)
         {
-            result = BlockType.COLUMN;
+            result = BlockType.Column;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_L)
         {
-            result = BlockType.BOMB;
+            result = BlockType.Bomb;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_T)
         {
@@ -658,11 +658,11 @@ public class MatchFinder
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_5)
         {
-            result = BlockType.RAINBOW;
+            result = BlockType.Rainbow;
         }
         else if(combo.type == MatchCombo.MatchTypes.MATCH_6_7)
         {
-            result = BlockType.RAINBOW;
+            result = BlockType.Rainbow;
         }
         return result;
     }

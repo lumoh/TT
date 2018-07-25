@@ -13,7 +13,7 @@ public class RockBlock : Block
     private void handleBreak(object param)
     {
         Block bo = (Block)param;
-        if(bo != null && bo.Type == BlockType.FALLING_MATCH && isAdjacent(bo.X, bo.Y))
+        if(bo != null && bo.Type == BlockType.Block && isAdjacent(bo.X, bo.Y))
         {
             Break(0f);
         }

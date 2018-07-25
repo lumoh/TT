@@ -9,13 +9,13 @@ public class Block : MonoBehaviour
 {    
     [Header("Board Settings")]
     public Tile MyTile;
-    public int TileLayer;
+    public int TileLayer = 3;
     public BlockState State = BlockState.SETTLED;
     public bool Swappable = true;
     public bool Matchable = true;
     public bool Fallable = true;
-    public float SwapSpeed = 0.2f;
-    public float Gravity = -3f;
+    public float SwapSpeed = 0.1f;
+    public float Gravity = -1.5f;
 
     /// <summary>
     /// used to help decide where the combo originated
@@ -32,11 +32,11 @@ public class Block : MonoBehaviour
     public Sprite BLUE;
     public Sprite PURPLE;
 
-    [SerializeField] private BlockColor _color = BlockColor.NONE;
-    [SerializeField] private BlockType _type = BlockType.NONE; 
+    [SerializeField] protected BlockColor _color = BlockColor.None;
+    [SerializeField] protected BlockType _type = BlockType.None; 
 
-    private bool _active = true;
-    private Vector3 _velocity;
+    protected bool _active = true;
+    protected Vector3 _velocity;
 
 	// Use this for initialization
 	public virtual void Start() 
@@ -49,6 +49,12 @@ public class Block : MonoBehaviour
     public void Init(BlockColor c, int tileLayer)
     {
         TileLayer = tileLayer;
+        Color = c;
+        name = Color.ToString();
+    }
+
+    public void Init(BlockColor c)
+    {
         Color = c;
         name = Color.ToString();
     }
@@ -121,6 +127,7 @@ public class Block : MonoBehaviour
 
     public void Swap(Tile t)
     {
+        LastMove++;
         State = BlockState.SWAPPING;
         LeanTween.move(gameObject, t.transform.position, SwapSpeed).setOnComplete(() =>
         {
@@ -128,7 +135,7 @@ public class Block : MonoBehaviour
         });
     }
 
-    public void Break(float animDelay)
+    public virtual void Break(float animDelay)
     {
         if(_active)
         {
@@ -138,6 +145,7 @@ public class Block : MonoBehaviour
             LeanTween.delayedCall(gameObject, animDelay, () =>
             {
                 GameEventManager.TriggerEvent(GameEventType.BREAK_BLOCK, this);
+                customBreakEffect();
                 LeanTween.delayedCall(gameObject, 0.15f, () =>
                 {
                     MyTile.RemoveBoardObject(TileLayer);
@@ -148,6 +156,14 @@ public class Block : MonoBehaviour
                 });
             });
         }
+    }
+
+    /// <summary>
+    /// override this to make other things happen when block breaks
+    /// </summary>
+    protected virtual void customBreakEffect()
+    {
+        // EMPTY
     }
 
     private void breakParticles()
@@ -192,27 +208,27 @@ public class Block : MonoBehaviour
     {
         if(MySpriteRenderer != null)
         {
-            if(_color == BlockColor.RED)
+            if(_color == BlockColor.Red)
             {
                 MySpriteRenderer.sprite = RED;
             }
-            else if(_color == BlockColor.TEAL)
+            else if(_color == BlockColor.Teal)
             {
                 MySpriteRenderer.sprite = TEAL;
             }
-            else if(_color == BlockColor.YELLOW)
+            else if(_color == BlockColor.Yellow)
             {
                 MySpriteRenderer.sprite = YELLOW;
             }
-            else if(_color == BlockColor.GREEN)
+            else if(_color == BlockColor.Green)
             {
                 MySpriteRenderer.sprite = GREEN;
             }
-            else if(_color == BlockColor.BLUE)
+            else if(_color == BlockColor.Blue)
             {
                 MySpriteRenderer.sprite = BLUE;
             }
-            else if(_color == BlockColor.PURPLE)
+            else if(_color == BlockColor.Purple)
             {
                 MySpriteRenderer.sprite = PURPLE;
             }
