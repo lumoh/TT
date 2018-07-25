@@ -5,12 +5,20 @@ using UnityEngine;
 public class Goals : MonoBehaviour 
 {
     public List<Goal> GoalList;
+    public bool Survival;
 
 	// Use this for initialization
     void Start()
     {
-        GameEventManager.RegisterForEvent(GameEventType.BREAK_BLOCK, handleBreakBlock);
-        GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
+        if(Survival)
+        {
+            gameObject.SetActive(false);
+        }
+        else
+        {
+            GameEventManager.RegisterForEvent(GameEventType.BREAK_BLOCK, handleBreakBlock);
+            GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
+        }
 	}
 
     private void handleBreakBlock(object param)

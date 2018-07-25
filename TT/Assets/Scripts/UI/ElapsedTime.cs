@@ -7,10 +7,14 @@ public class ElapsedTime : MonoBehaviour
 {
     private Text _text;
     private float _startTime;
+    private bool _update;
 
 	void Awake() 
     {
+        _update = true;
         GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
+        GameEventManager.RegisterForEvent(GameEventType.GAME_LOST, handleEnd);
+        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleEnd);
         _text = GetComponent<Text>();
         _startTime = Time.time;
         setText();
@@ -18,7 +22,10 @@ public class ElapsedTime : MonoBehaviour
 
     void Update()
     {
-        setText();
+        if(_update)
+        {
+            setText();
+        }
     }
 
     private void setText()
@@ -36,12 +43,20 @@ public class ElapsedTime : MonoBehaviour
 
     private void handleRestart(object param)
     {
+        _update = true;
         _startTime = Time.time;
         setText();
+    }
+
+    private void handleEnd(object param)
+    {
+        _update = false;
     }
 
     void OnDestroy()
     {
         GameEventManager.UnRegisterForEvent(GameEventType.RESTART, handleRestart);
+        GameEventManager.UnRegisterForEvent(GameEventType.GAME_LOST, handleEnd);
+        GameEventManager.UnRegisterForEvent(GameEventType.GAME_WON, handleEnd);
     }
 }
