@@ -14,8 +14,9 @@ public class Block : MonoBehaviour
     public bool Swappable = true;
     public bool Matchable = true;
     public bool Fallable = true;
-    public float SwapSpeed = 0.1f;
     public float Gravity = -1.5f;
+
+    public int ComboMultiplier = 1;
 
     /// <summary>
     /// used to help decide where the combo originated
@@ -129,41 +130,33 @@ public class Block : MonoBehaviour
     {
         LastMove++;
         State = BlockState.SWAPPING;
-        LeanTween.move(gameObject, t.transform.position, SwapSpeed).setOnComplete(() =>
-        {
-            State = BlockState.FALLING;
-        });
+        LeanTween.move(gameObject, t.transform.position, 0.075f);
     }
 
-    public virtual void Break(float animDelay)
+    public virtual void Break(float animDelay, float animOffset = 0f, int multiplier = 1)
     {
-        LeanTween.delayedCall(gameObject, animDelay, () =>
+        if(_active)
         {
-            if(_active)
-            {
-                SetActive(false);
-                State = BlockState.BREAKING;
+            SetActive(false);
+            State = BlockState.BREAKING;
 
+            LeanTween.delayedCall(gameObject, animDelay, () =>
+            {
                 GameEventManager.TriggerEvent(GameEventType.BREAK_BLOCK, this);
                 customBreakEffect();
 
-                if(State == BlockState.COLLECTING)
-                {
-                    LeanTween.delayedCall(gameObject, 0.15f, () =>
-                    {
-                        MyTile.RemoveBoardObject(TileLayer);
-                    });
-                }
-                else if(State == BlockState.BREAKING)
+                MyBoard.ApplyComboMultiplierFromMatch(multiplier, this);
+                MyTile.RemoveBoardObject(TileLayer);
+
+                if(State == BlockState.BREAKING)
                 {
                     LeanTween.scale(gameObject, Vector3.zero, 0.15f).setOnComplete(() =>
                     {
-                        MyTile.RemoveBoardObject(TileLayer);
                         Destroy(gameObject);
-                    });
+                    }).setDelay(animOffset);
                 }
-            }
-        });
+            });
+        }
     }
 
     /// <summary>
@@ -210,6 +203,11 @@ public class Block : MonoBehaviour
             MySpriteRenderer.color = c;
         }
         _active = active;
+    }
+
+    public bool IsActive
+    {
+        get { return _active; }
     }
 
     protected void setSpriteForColor()
@@ -282,7 +280,10 @@ public class Block : MonoBehaviour
 
                         if(!isBlockAbove())
                         {
-                            MyBoard.BreakMatches();
+                            if(!MyBoard.BreakMatchesInColumn(X))
+                            {
+                                MyBoard.ResetComboMultiplierForColumn(1, this);
+                            }
                         }
                     }
                     // if not blocked then move to it

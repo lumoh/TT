@@ -301,13 +301,20 @@ public class Board : MonoBehaviour
         return flag;
     }
 
-    /// <summary>
-    /// Finds the matches.
-    /// </summary>
-    /// <returns><c>true</c>, if matches was found, <c>false</c> otherwise.</returns>
-    public bool BreakMatches()
+    public bool BreakMatches(bool fromSwap = false)
     {
         List<MatchCombo> matchCombos = MatchFinder.GetAllMatchesOnBoard(this);
+        return breakCombos(matchCombos, fromSwap);
+    }
+
+    public bool BreakMatchesInColumn(int x, bool fromSwap = false)
+    {
+        List<MatchCombo> matchCombos = MatchFinder.GetMatchesInColumn(x, this);
+        return breakCombos(matchCombos, fromSwap);
+    }
+
+    private bool breakCombos(List<MatchCombo> matchCombos, bool fromSwap)
+    {
         if (matchCombos.Count == 0)
         {
             return false;
@@ -315,28 +322,90 @@ public class Board : MonoBehaviour
         for (int i = 0; i < matchCombos.Count; ++i) 
         {
             MatchCombo combo = matchCombos[i];
-            for(int j = 0; j < combo.matches.Count; ++j)
+            int maxMultiplier = 1;
+            if(!fromSwap)
             {
+                for(int j = 0; j < combo.matches.Count; ++j)
+                {                
+                    Block boardObject = combo.matches[j];
+                    if(boardObject != null)
+                    {
+                        maxMultiplier = Mathf.Max(maxMultiplier, boardObject.ComboMultiplier);
+                    }
+                }
+            }
+
+            for(int j = 0; j < combo.matches.Count; ++j)
+            {                
                 Block boardObject = combo.matches[j];
                 if(boardObject != null)
                 {
-                    float delay = (float)j * 0.1f;
-                    boardObject.Break(delay);
+                    float delay = 2.0f;
+                    boardObject.Break(delay, (float)j * 0.1f, maxMultiplier + 1);
                     if(IsBreakDelay)
                     {
                         _scrollingDelay = delay;
                     }
-                }                    
+                }
             }
 
-//            if(combo.IsCreateType())
-//            {
-//                BlockType spawnType = MatchFinder.BlockTypeFromCombo(combo);
-//                Block spawnBlock = SpawnBlock(spawnType.ToString(), combo.matchPiece.Color);
-//                combo.matchPiece.MyTile.AddBoardObject(spawnBlock);
+//            for(int j = 0; j < combo.matches.Count; ++j)
+//            {                
+//                Block boardObject = combo.matches[j];
+//                if(boardObject != null)
+//                {
+//                    ApplyComboMultiplierFromMatch(maxMultiplier + 1, boardObject);
+//                }
 //            }
+
+            Debug.Log("COMBO = " + maxMultiplier);
+
+            //            if(combo.IsCreateType())
+            //            {
+            //                BlockType spawnType = MatchFinder.BlockTypeFromCombo(combo);
+            //                Block spawnBlock = SpawnBlock(spawnType.ToString(), combo.matchPiece.Color);
+            //                combo.matchPiece.MyTile.AddBoardObject(spawnBlock);
+            //            }
         }
         return true;
+    }
+
+    public void ApplyComboMultiplierFromMatch(int multiplier, Block b)
+    {
+        for(int y = b.Y - 1; y >= MinY; y--)
+        {
+            Tile tile = GetTile(b.X, y);
+            if(tile != null)
+            {
+                Block block = tile.GetBoardObect();
+                if(block != null)
+                {
+                    if(block.IsActive)
+                    {
+                        block.ComboMultiplier = multiplier;
+                    }
+                }
+            }
+        }
+    }
+
+    public void ResetComboMultiplierForColumn(int multiplier, Block b)
+    {
+        for(int y = b.Y; y <= MaxY; y++)
+        {
+            Tile tile = GetTile(b.X, y);
+            if(tile != null)
+            {
+                Block block = tile.GetBoardObect();
+                if(block != null)
+                {
+                    if(block.IsActive)
+                    {
+                        block.ComboMultiplier = multiplier;
+                    }
+                }
+            }
+        }
     }
 
     public bool MatchExists()
@@ -402,12 +471,33 @@ public class Board : MonoBehaviour
                     t1.AddBoardObject(b2, false);
                     b2.Swap(t1);
                 }
-
                 GameEventManager.TriggerEvent(GameEventType.MOVE);
             }
 
-            LeanTween.delayedCall(0.12f, () =>
+            LeanTween.delayedCall(0.1f, () =>
             {
+                if(swapB1 || swapB2)
+                {
+                    if(swapB1 && swapB2)
+                    {
+                        b1.State = BlockState.SETTLED;
+                        b2.State = BlockState.SETTLED;
+
+                        BreakMatchesInColumn(b1.X, true);
+                        BreakMatchesInColumn(b2.X, true);
+                    }
+                    else if(swapB1 && !swapB2)
+                    {
+                        b1.State = BlockState.FALLING;
+                        b1.ComboMultiplier = 1;
+                    }
+                    else if(swapB2 && !swapB1)
+                    {
+                        b2.State = BlockState.FALLING;
+                        b1.ComboMultiplier = 2;
+                    }
+                }
+
                 _swapOnCooldown = false;
             });
         }
@@ -585,9 +675,8 @@ public class Board : MonoBehaviour
             {
                 AddRandomBlock("Block", tile);
             }
+            BreakMatchesInColumn(x, true);
         }
-
-        BreakMatches();
     }
 
     private void handleGameWon(object param)

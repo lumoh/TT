@@ -64,7 +64,7 @@ public class Tile : MonoBehaviour {
         }
     }
 
-    public Block GetBoardObect(int layer)
+    public Block GetBoardObect(int layer = 3)
     {
         Block boardObject = null;
         if (_boardObjects != null && layer >= 0 && layer < NUM_LAYERS)

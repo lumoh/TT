@@ -73,6 +73,37 @@ public class MatchFinder
         
         return matches;
     }
+
+    public List<MatchCombo> GetMatchesInColumn(int x, Board board)
+    {
+        matches.Clear();
+        matched.Clear();
+        MatchCombo matchCombo;
+
+        for (int y = board.MinY; y <= board.MaxY; y++) 
+        {
+            Block blockModel = board.GetBoardObject(x, y);
+
+            if(blockModel != null && matched[blockModel] == null)
+            {
+                List<Block> connectedObjects = GetConnectedObjects(board, blockModel);
+
+                for(int i = 0; i < connectedObjects.Count; i++)
+                {
+                    Block connectedObject = connectedObjects[i];
+                    matched[connectedObject] = 1;
+                }
+
+                matchCombo = GetMatch(board, connectedObjects);
+                if(matchCombo != null)
+                {
+                    matches.Add(matchCombo);
+                }
+            }
+        }
+
+        return matches;
+    }
     
     /// <summary>
     /// Gets the connected objects.

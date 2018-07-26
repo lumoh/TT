@@ -54,6 +54,11 @@ public class MatchCombo : System.Object
 	/// </summary>
 	public Block matchPiece;
 
+    /// <summary>
+    /// The combo multiplier.
+    /// </summary>
+    public int multiplier;
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="MatchCombo"/> class.
 	/// </summary>
