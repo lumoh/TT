@@ -130,7 +130,10 @@ public class Block : MonoBehaviour
     {
         LastMove++;
         State = BlockState.SWAPPING;
-        LeanTween.move(gameObject, t.transform.position, 0.075f);
+        LeanTween.move(gameObject, t.transform.position, 0.075f).setOnComplete(() =>
+        {
+            transform.position = t.transform.position;             
+        });
     }
 
     public virtual void Break(float animDelay, float animOffset = 0f, int multiplier = 1)
@@ -150,7 +153,7 @@ public class Block : MonoBehaviour
 
                 if(State == BlockState.BREAKING)
                 {
-                    LeanTween.scale(gameObject, Vector3.zero, 0.15f).setOnComplete(() =>
+                    LeanTween.scale(gameObject, Vector3.zero, 0.075f).setOnComplete(() =>
                     {
                         Destroy(gameObject);
                     }).setDelay(animOffset);

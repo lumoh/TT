@@ -33,6 +33,11 @@ public class Board : MonoBehaviour
     public int NumColors;
 
     /// <summary>
+    /// The break delay.
+    /// </summary>
+    public float BreakDelay;
+
+    /// <summary>
     /// does the board freeze movement when break occurs
     /// </summary>
     public bool IsBreakDelay;
@@ -340,32 +345,48 @@ public class Board : MonoBehaviour
                 Block boardObject = combo.matches[j];
                 if(boardObject != null)
                 {
-                    float delay = 2.0f;
-                    boardObject.Break(delay, (float)j * 0.1f, maxMultiplier + 1);
+                    boardObject.Break(BreakDelay, (float)j * 0.1f, maxMultiplier + 1);
                     if(IsBreakDelay)
                     {
-                        _scrollingDelay = delay;
+                        _scrollingDelay = BreakDelay;
                     }
                 }
             }
 
-//            for(int j = 0; j < combo.matches.Count; ++j)
-//            {                
-//                Block boardObject = combo.matches[j];
-//                if(boardObject != null)
-//                {
-//                    ApplyComboMultiplierFromMatch(maxMultiplier + 1, boardObject);
-//                }
-//            }
+            Block bestBlock = combo.matches[0];
+            if(maxMultiplier > 1)
+            {
+                GameObject Prefab = Resources.Load<GameObject>("Multiplier");
+                if(Prefab != null)
+                {
+                    GameObject obj = Instantiate(Prefab);
+                    if(obj != null)
+                    {
+                        Multiplier multiplier = obj.GetComponent<Multiplier>();
+                        multiplier.Init(maxMultiplier, BoardCamera);
+                        obj.transform.position = bestBlock.transform.position + new Vector3(-1, 1, 0);
+                    }
+                }
+            }
 
-            Debug.Log("COMBO = " + maxMultiplier);
+            if(combo.IsCreateType())
+            {
+                GameObject Prefab = Resources.Load<GameObject>("Multiplier");
+                if(Prefab != null)
+                {
+                    GameObject obj = Instantiate(Prefab);
+                    if(obj != null)
+                    {
+                        Multiplier multiplier = obj.GetComponent<Multiplier>();
+                        multiplier.Init(combo.matches.Count, BoardCamera);
+                        obj.transform.position = bestBlock.transform.position + new Vector3(1, 1, 0);
+                    }
+                }
+                //                BlockType spawnType = MatchFinder.BlockTypeFromCombo(combo);
+                //                Block spawnBlock = SpawnBlock(spawnType.ToString(), combo.matchPiece.Color);
+                //                combo.matchPiece.MyTile.AddBoardObject(spawnBlock);
 
-            //            if(combo.IsCreateType())
-            //            {
-            //                BlockType spawnType = MatchFinder.BlockTypeFromCombo(combo);
-            //                Block spawnBlock = SpawnBlock(spawnType.ToString(), combo.matchPiece.Color);
-            //                combo.matchPiece.MyTile.AddBoardObject(spawnBlock);
-            //            }
+            }
         }
         return true;
     }
