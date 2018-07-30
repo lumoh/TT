@@ -15,7 +15,7 @@ public class Board : MonoBehaviour
     /// <summary>
     /// The board camera.
     /// </summary>
-    public Camera BoardCamera;
+    public BoardCamera BoardCamera;
 
     /// <summary>
     /// num blocks vertical
@@ -110,26 +110,9 @@ public class Board : MonoBehaviour
 	/// <summary>
     /// initialize a board and setup camera
     /// </summary>
-	void Start ()
+	void Start()
     {
-        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
-        GameEventManager.RegisterForEvent(GameEventType.RESTART, handleRestart);
-        GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_UP, handleSpeedUpUp);
-        GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_DOWN, handleSpeedUpDown);
-        GameEventManager.RegisterForEvent(GameEventType.NATURAL_SPEEDUP, handleNaturalSpeedUp);
 
-        Application.targetFrameRate = 60;
-        LeanTween.init(1000);
-        MatchFinder = new MatchFinder();
-
-        if(BoardCamera == null)
-        {
-            BoardCamera = GameObject.Find("BoardCamera").GetComponent<Camera>();
-        }
-        BoardCamera.transform.localPosition = new Vector3(1, -5.6f, -10);
-        transform.localPosition = new Vector3(0, 0, 0);
-
-        Init();
 	}
 
     /// <summary>
@@ -137,8 +120,18 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <param name="width">Width.</param>
     /// <param name="height">Height.</param>
-    public void Init()
+    public void Init(BoardCamera cam)
     {
+        GameEventManager.RegisterForEvent(GameEventType.GAME_WON, handleGameWon);
+        GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_UP, handleSpeedUpUp);
+        GameEventManager.RegisterForEvent(GameEventType.SPEEDUP_DOWN, handleSpeedUpDown);
+        GameEventManager.RegisterForEvent(GameEventType.NATURAL_SPEEDUP, handleNaturalSpeedUp);
+
+        MatchFinder = new MatchFinder();
+        BoardCamera = cam;
+        BoardCamera.Init(this);
+        transform.localPosition = new Vector3(0, 0, 0);
+
         MinY = 0;
         MaxY = Height - 1;
         _queuedRows = 2;
@@ -373,7 +366,7 @@ public class Board : MonoBehaviour
                     if(obj != null)
                     {
                         Multiplier multiplier = obj.GetComponent<Multiplier>();
-                        multiplier.Init(maxMultiplier, BoardCamera);
+                        multiplier.Init(maxMultiplier, BoardCamera.cam);
                         obj.transform.position = bestBlock.transform.position + new Vector3(-1, 1, 0);
                     }
                 }
@@ -388,7 +381,7 @@ public class Board : MonoBehaviour
                     if(obj != null)
                     {
                         Multiplier multiplier = obj.GetComponent<Multiplier>();
-                        multiplier.Init(combo.matches.Count, BoardCamera);
+                        multiplier.Init(combo.matches.Count, BoardCamera.cam);
                         obj.transform.position = bestBlock.transform.position + new Vector3(1, 1, 0);
                     }
                 }
@@ -715,13 +708,6 @@ public class Board : MonoBehaviour
         _gameOver = true;
     }
 
-    private void handleRestart(object param)
-    {
-        GameObject BoardPrefab = Resources.Load<GameObject>("Board");
-        Instantiate(BoardPrefab);
-        Destroy(gameObject);
-    }
-
     private void handleSpeedUpDown(object param)
     {
         _speedingUp = true;
@@ -741,7 +727,6 @@ public class Board : MonoBehaviour
     {
         LeanTween.cancel(gameObject);
         GameEventManager.UnRegisterForEvent(GameEventType.GAME_WON, handleGameWon);
-        GameEventManager.UnRegisterForEvent(GameEventType.RESTART, handleRestart);
         GameEventManager.UnRegisterForEvent(GameEventType.SPEEDUP_UP, handleSpeedUpUp);
         GameEventManager.UnRegisterForEvent(GameEventType.SPEEDUP_DOWN, handleSpeedUpDown);
         GameEventManager.UnRegisterForEvent(GameEventType.NATURAL_SPEEDUP, handleNaturalSpeedUp);

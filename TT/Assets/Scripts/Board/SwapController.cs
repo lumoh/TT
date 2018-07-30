@@ -17,16 +17,16 @@ public class SwapController : MonoBehaviour
     void Start()
     {
         _board = GetComponent<Board>();	
-        _camera = _board.BoardCamera;
+        _camera = _board.BoardCamera.cam;
         _down = false;
 	}
 	
 	// Update is called once per frame
-	void Update () 
+	void Update ()
     {
         if(_camera == null)
         {
-            _camera = _board.BoardCamera;
+            _camera = _board.BoardCamera.cam;
         }
 
         if(Input.GetKeyDown(KeyCode.Space))
@@ -50,17 +50,20 @@ public class SwapController : MonoBehaviour
             _origin = _camera.ScreenToWorldPoint(Input.mousePosition);
             _blockToSwap = null;
 
-            RaycastHit2D[] hits = Physics2D.RaycastAll(_origin, -Vector2.zero, Mathf.Infinity);
-            for(int i = 0; i < hits.Length; i++)
+            if(_camera.orthographic)
             {
-                RaycastHit2D hit = hits[i];
-                if (hit && hit.transform.tag == "Block")
+                RaycastHit2D[] hits = Physics2D.RaycastAll(_origin, -Vector2.zero, Mathf.Infinity);
+                for(int i = 0; i < hits.Length; i++)
                 {
-                    Block bo = hit.transform.GetComponent<Block>();
-                    if (bo != null)
+                    RaycastHit2D hit = hits[i];
+                    if(hit && hit.transform.tag == "Block")
                     {
-                        _blockToSwap = bo;
-                        _down = true;
+                        Block bo = hit.transform.GetComponent<Block>();
+                        if(bo != null)
+                        {
+                            _blockToSwap = bo;
+                            _down = true;
+                        }
                     }
                 }
             }
