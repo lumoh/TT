@@ -58,6 +58,11 @@ public class Board : MonoBehaviour
     public float ForceSpeed;
 
     /// <summary>
+    /// The has spawners.
+    /// </summary>
+    public bool HasSpawners;
+
+    /// <summary>
     /// The minimum playable y range
     /// </summary>
     [HideInInspector] public int MinY;
@@ -196,6 +201,11 @@ public class Board : MonoBehaviour
                             Destroy(bo.gameObject);
                             AddRandomBlock("Block", tile);
                         }
+                    }
+
+                    if(y == 7 && HasSpawners)
+                    {
+                        addSpawner(tile, "Block", 3);
                     }
                 }
             }
