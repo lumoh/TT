@@ -246,7 +246,7 @@ public class Block : MonoBehaviour
 
     void Update()
     {
-        if(State == BlockState.BREAKING || State == BlockState.COLLECTING)
+        if(State == BlockState.BREAKING || State == BlockState.COLLECTING || State == BlockState.SWAPPING)
         {
             return;
         }

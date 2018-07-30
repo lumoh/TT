@@ -515,7 +515,7 @@ public class Board : MonoBehaviour
                     else if(swapB2 && !swapB1)
                     {
                         b2.State = BlockState.FALLING;
-                        b1.ComboMultiplier = 2;
+                        b2.ComboMultiplier = 1;
                     }
                 }
 
